@@ -12,5 +12,5 @@ Topic: Health and Income
 Essential Question: "Is there a relationship between income level and number of chronic health conditions?"
 Sources: 
 - Income data (S1901): U.S. Census Bureau's American Community Survey(CSV)--> different files for 2019-2023 
-- PLACES health data: CDC (Centers for Disease Control and Prevention)
+- NHIS Adult Summary Health Statistics (Centers for Disease Control and Prevention)
 Potential Visualizations: Heat maps, comparative bar charts, line graph
