@@ -11,20 +11,10 @@ const IncomeGeorgiaMap = () => {
   useEffect(() => {
     const parseCSV = async () => {
       try {
-        // Get the data path and log it for debugging
-        const dataFilePath = getDataPath('GeorgiaIncomeData.csv');
-        console.log("Attempting to fetch CSV file from:", dataFilePath);
-        
-        // Add a timestamp to avoid caching issues
-        const cacheBuster = `?t=${new Date().getTime()}`;
-        const response = await fetch(`${dataFilePath}${cacheBuster}`);
-        console.log("Fetch response status:", response.status);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}, path: ${dataFilePath}`);
-        }
-        
-        const csvText = await response.text();
+        // Get the CSV content directly from our utility
+        console.log("Getting Georgia Income data directly");
+        const csvText = getDataPath('GeorgiaIncomeData.csv');
+        console.log("CSV data loaded, length:", csvText.length);
         console.log("CSV loaded, length:", csvText.length);
         console.log("First 100 chars:", csvText.substring(0, 100));
         

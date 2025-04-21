@@ -12,16 +12,10 @@ const BlackPopulationGeorgia = () => {
   useEffect(() => {
     const loadCSV = async () => {
       try {
-        console.log("Attempting to fetch CSV file...");
-        // For deployment, the file should be in the public directory
-        const response = await fetch(getDataPath('georgia race population - Sheet1.csv'));
-        console.log("Fetch response status:", response.status);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const csvText = await response.text();
+        // Get the CSV content directly from our utility
+        console.log("Getting Georgia Race Population data directly");
+        const csvText = getDataPath('georgia race population - Sheet1.csv');
+        console.log("CSV data loaded, length:", csvText.length);
         console.log("CSV loaded, length:", csvText.length);
         console.log("First 100 chars:", csvText.substring(0, 100));
         

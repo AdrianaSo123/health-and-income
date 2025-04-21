@@ -16,26 +16,13 @@ const IncomeVsCardioGeorgia = () => {
       try {
         setIsLoading(true);
         
-        // Define file paths using utility function
-        const incomePath = getDataPath('GeorgiaIncomeData.csv');
-        const hypertensionPath = getDataPath('HypertensionCountyData.csv');
+        // Get the CSV content directly from our utility
+        console.log("Getting Income and Hypertension data directly");
+        const incomeText = getDataPath('GeorgiaIncomeData.csv');
+        const hypertensionText = getDataPath('HypertensionCountyData.csv');
         
-        // Fetch both CSV files
-        const responses = await Promise.all([
-          fetch(incomePath),
-          fetch(hypertensionPath)
-        ]);
-        
-        // Check if both requests succeeded
-        if (!responses[0].ok || !responses[1].ok) {
-          throw new Error("Failed to fetch data files");
-        }
-        
-        // Get text content from both responses
-        const [incomeText, hypertensionText] = await Promise.all([
-          responses[0].text(),
-          responses[1].text()
-        ]);
+        console.log("Income data loaded, length:", incomeText.length);
+        console.log("Hypertension data loaded, length:", hypertensionText.length);
         
         // Process income data
         const incomeData = {};

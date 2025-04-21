@@ -13,20 +13,10 @@ const HypertensionChart = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Get the data path and log it for debugging
-        const dataFilePath = getDataPath('HypertensionHistoricalData.csv');
-        console.log("Attempting to fetch CSV file from:", dataFilePath);
-        
-        // Add a timestamp to avoid caching issues
-        const cacheBuster = `?t=${new Date().getTime()}`;
-        const response = await fetch(`${dataFilePath}${cacheBuster}`);
-        console.log("Fetch response status:", response.status);
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}, path: ${dataFilePath}`);
-        }
-        
-        const fileContent = await response.text();
+        // Get the CSV content directly from our utility
+        console.log("Getting Hypertension Historical data directly");
+        const fileContent = getDataPath('HypertensionHistoricalData.csv');
+        console.log("CSV data loaded, length:", fileContent.length);
         
         // Parse CSV data
         const parsedData = Papa.parse(fileContent, {
