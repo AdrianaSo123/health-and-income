@@ -77,15 +77,15 @@ const BlackPopulationGeorgia = () => {
     d3.select(svgRef.current).selectAll("*").remove();
     
     // Map dimensions with increased margins for more spacing
-    const width = 800;
-    const height = 600;
-    const margin = { top: 70, right: 40, bottom: 60, left: 40 };
+    const width = 900;
+    const height = 500;
+    const margin = { top: 60, right: 50, bottom: 70, left: 70 };
     
     // Create SVG
     const svg = d3.select(svgRef.current)
-      .attr("width", width)
-      .attr("height", height)
-      .attr("viewBox", [0, 0, width, height]);
+      .attr('width', '100%')
+      .attr('height', height)
+      .attr('viewBox', `0 0 ${width} ${height}`);
     
     // Create percentage lookup for counties
     const percentByCounty = {};

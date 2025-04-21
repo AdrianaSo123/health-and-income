@@ -158,8 +158,8 @@ const IncomeVsCardioGeorgia = () => {
       
       // Create the SVG element
       const svg = d3.select(svgRef.current);
-      const width = parseInt(svg.attr("width"));
-      const height = parseInt(svg.attr("height"));
+      const width = 900;
+      const height = 500;
       const margin = { top: 60, right: 50, bottom: 70, left: 70 };
       
       // Calculate inner dimensions
@@ -440,7 +440,7 @@ const IncomeVsCardioGeorgia = () => {
       
       <svg 
         ref={svgRef}
-        width="800" 
+        width="900" 
         height="500" 
         style={{
           margin: '0 auto',
@@ -451,7 +451,7 @@ const IncomeVsCardioGeorgia = () => {
         }}
       ></svg>
       
-      <div style={{ maxWidth: '700px', margin: '20px auto', padding: '0 20px' }}>
+      <div style={{ maxWidth: '900px', margin: '20px auto', padding: '0 20px' }}>
         <h3>About this Visualization</h3>
         <p>
           This scatterplot explores the relationship between median household income 

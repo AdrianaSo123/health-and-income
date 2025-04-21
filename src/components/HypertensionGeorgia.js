@@ -71,15 +71,15 @@ const HypertensionGeorgia = () => {
     d3.select(svgRef.current).selectAll("*").remove();
     
     // Map dimensions with increased margins for more spacing
-    const width = 800;
-    const height = 600;
-    const margin = { top: 70, right: 40, bottom: 60, left: 40 };
+    const width = 900;
+    const height = 500;
+    const margin = { top: 60, right: 50, bottom: 70, left: 70 };
     
     // Create SVG with a background for better contrast with white text
     const svg = d3.select(svgRef.current)
-      .attr("width", width)
-      .attr("height", height)
-      .attr("viewBox", [0, 0, width, height]);
+      .attr('width', width)
+      .attr('height', height)
+      .attr('viewBox', `0 0 ${width} ${height}`);
     
     // Create disease rate lookup for counties
     const rateByCounty = {};
@@ -229,6 +229,17 @@ const HypertensionGeorgia = () => {
             .attr("stop-color", colorScale(minRate + (i / (stops - 1)) * (maxRate - minRate)));
         }
         
+        // Draw legend background
+        svg.append("rect")
+          .attr("x", legendX - 8)
+          .attr("y", legendY - 8)
+          .attr("width", legendWidth + 16)
+          .attr("height", legendHeight + 32)
+          .attr("rx", 8)
+          .attr("fill", "#f8f8f8")
+          .attr("stroke", "#bbb")
+          .attr("stroke-width", 1);
+
         // Draw legend rectangle
         svg.append("rect")
           .attr("x", legendX)
@@ -237,29 +248,29 @@ const HypertensionGeorgia = () => {
           .attr("height", legendHeight)
           .style("fill", "url(#rate-gradient)");
         
-        // Add legend labels with white text
+        // Add legend labels below the gradient
         svg.append("text")
           .attr("x", legendX)
-          .attr("y", legendY - 5)
-          .style("font-size", "10px")
+          .attr("y", legendY + legendHeight + 18)
+          .style("font-size", "18px")
           .style("text-anchor", "start")
-          .style("fill", "white")
+          .style("fill", "#333")
           .text(`${minRate.toFixed(1)}`);
         
         svg.append("text")
           .attr("x", legendX + legendWidth / 2)
-          .attr("y", legendY - 5)
-          .style("font-size", "10px")
+          .attr("y", legendY + legendHeight + 18)
+          .style("font-size", "18px")
           .style("text-anchor", "middle")
-          .style("fill", "white")
+          .style("fill", "#333")
           .text(`${((minRate + maxRate) / 2).toFixed(1)}`);
         
         svg.append("text")
           .attr("x", legendX + legendWidth)
-          .attr("y", legendY - 5)
-          .style("font-size", "10px")
+          .attr("y", legendY + legendHeight + 18)
+          .style("font-size", "18px")
           .style("text-anchor", "end")
-          .style("fill", "white")
+          .style("fill", "#333")
           .text(`${maxRate.toFixed(1)}`);
         
         // Add title (positioned higher from the map)
@@ -291,14 +302,14 @@ const HypertensionGeorgia = () => {
     <div className="w-full flex flex-col items-center">
       {loading && <p className="text-white">Loading data...</p>}
       {error && (
-        <div className="text-center my-4">
+        <div className="chart-container" style={{ margin: '20px auto', maxWidth: '900px' }}>
           <p className="text-red-500 font-bold">Error: {error}</p>
           <p className="text-white text-sm mt-2">
             Please check that your CSV file is in the correct location: /public/data/HypertensionCountyData.csv
           </p>
         </div>
       )}
-      <svg ref={svgRef} className="max-w-full h-auto"></svg>
+      <svg ref={svgRef} width="900" height="500"></svg>
       {countyData.length > 0 && (
         <p className="text-sm mt-2 text-white">
           Showing cardiovascular disease rates for {countyData.length} Georgia counties

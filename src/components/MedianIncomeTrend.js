@@ -25,9 +25,10 @@ const MedianIncomeTrend = () => {
       d3.select(svgRef.current).selectAll('*').remove();
 
       // Set dimensions
-      const width = 800;
-      const height = 500;
-      const margin = { top: 50, right: 80, bottom: 60, left: 120 };
+      // Larger, more readable, and consistent chart
+      const width = 750;
+      const height = 375;
+      const margin = { top: 70, right: 40, bottom: 100, left: 90 };
       const innerWidth = width - margin.left - margin.right;
       const innerHeight = height - margin.top - margin.bottom;
 
@@ -41,32 +42,31 @@ const MedianIncomeTrend = () => {
       const g = svg.append('g')
         .attr('transform', `translate(${margin.left},${margin.top})`);
 
-      // Create scales with padding
-      const x = d3.scaleLinear()
-        .domain([
-          d3.min(data, d => d.year) - 0.5,
-          d3.max(data, d => d.year) + 0.5
-        ])
-        .range([0, innerWidth]);
+      // Create band scale for x (like HypertensionTrend)
+      const x = d3.scaleBand()
+        .domain(data.map(d => d.year.toString()))
+        .range([0, innerWidth])
+        .padding(0.2);
 
+      // Restore y-axis to original logic
+      const maxIncome = d3.max(data, d => d.income);
+      const minIncome = d3.min(data, d => d.income);
+      // Set y-axis domain to end at 80,000
+      const yAxisMax = 80000;
       const y = d3.scaleLinear()
         .domain([
-          d3.min(data, d => d.income) * 0.9,
-          d3.max(data, d => d.income) * 1.1
+          Math.floor(minIncome * 0.98),
+          yAxisMax
         ])
         .range([innerHeight, 0]);
 
-      // Create line generator
-      const line = d3.line()
-        .x(d => x(d.year))
-        .y(d => y(d.income))
-        .curve(d3.curveMonotoneX);
 
-      // Add grid lines
+
+      // Add grid lines (match HypertensionTrend)
       g.append('g')
         .attr('class', 'grid')
         .selectAll('line')
-        .data(y.ticks(10))
+        .data(y.ticks(4))
         .enter()
         .append('line')
         .attr('x1', 0)
@@ -76,89 +76,104 @@ const MedianIncomeTrend = () => {
         .attr('stroke', '#eee')
         .attr('stroke-dasharray', '2,2');
 
-      // Add line path
+      // Create line generator for band scale
+      const line = d3.line()
+        .x(d => x(d.year.toString()) + x.bandwidth() / 2)
+        .y(d => y(d.income))
+        .curve(d3.curveMonotoneX);
+
+      // Add line path (distinct green)
       g.append('path')
         .datum(data)
-        .attr('class', 'line')
         .attr('fill', 'none')
-        .attr('stroke', '#2a9d8f')
+        .attr('stroke', '#228B22') // ForestGreen
         .attr('stroke-width', 3)
         .attr('d', line);
 
-      // Add data points
-      const points = g.selectAll('.data-point')
+      // Add data points (circles)
+      g.selectAll('.dot')
         .data(data)
         .enter()
-        .append('g')
-        .attr('class', 'data-point')
-        .attr('transform', d => `translate(${x(d.year)},${y(d.income)})`);
+        .append('circle')
+        .attr('cx', d => x(d.year.toString()) + x.bandwidth() / 2)
+        .attr('cy', d => y(d.income))
+        .attr('r', 5)
+        .attr('fill', '#228B22');
 
-      // Add circles for data points
-      points.append('circle')
-        .attr('r', 6)
-        .attr('fill', '#2a9d8f')
-        .attr('stroke', 'white')
-        .attr('stroke-width', 2);
-
-      // Add data labels with background
-      points.append('rect')
-        .attr('class', 'label-background')
-        .attr('x', -45)
-        .attr('y', -30)
-        .attr('width', 90)
-        .attr('height', 20)
-        .attr('fill', 'white')
-        .attr('rx', 4);
-
-      points.append('text')
-        .attr('class', 'income-label')
-        .attr('y', -15)
+      // Add value labels above every point, including the max value
+      g.selectAll('.label')
+        .data(data)
+        .enter()
+        .append('text')
+        .attr('x', d => x(d.year.toString()) + x.bandwidth() / 2)
+        .attr('y', d => y(d.income) - 10)
         .attr('text-anchor', 'middle')
-        .attr('font-size', '12px')
-        .text(d => `$${d3.format(",")(d.income)}`);
+        .attr('font-size', '10px')
+        .attr('fill', '#228B22')
+        .text(d => `$${d3.format(',')(d.income)}`);
 
-      // Add axes
+      // Add axes (band scale, rotated labels)
       const xAxis = g.append('g')
         .attr('transform', `translate(0,${innerHeight})`)
-        .call(d3.axisBottom(x)
-          .ticks(data.length)
-          .tickFormat(d3.format('d')));
+        .call(d3.axisBottom(x));
+      xAxis.selectAll('text')
+        .attr('transform', 'translate(-10,10) rotate(-45)')
+        .style('text-anchor', 'end')
+        .attr('font-size', '16px')
+        .attr('font-weight', 'bold')
+        .attr('fill', 'black');
+      xAxis.selectAll('line')
+        .attr('stroke', 'black')
+        .attr('stroke-width', 1.5);
+      xAxis.selectAll('.domain')
+        .attr('stroke', 'black')
+        .attr('stroke-width', 2);
 
+      // Restore default y-axis ticks (no filtering)
+      // Keep the same number of ticks, but set the last tick to 80,000
+      const numTicks = 6;
+      let tickVals = y.ticks(numTicks);
+      tickVals[tickVals.length - 1] = yAxisMax; // Ensure last tick is 80,000
       const yAxis = g.append('g')
         .call(d3.axisLeft(y)
-          .ticks(10)
+          .tickValues(tickVals)
           .tickFormat(d => `$${d3.format(",")(d)}`));
-
-      // Style axis lines
-      xAxis.selectAll('line')
-        .style('stroke', '#888');
+      yAxis.selectAll('text')
+        .attr('font-size', '16px')
+        .attr('font-weight', 'bold')
+        .attr('fill', 'black');
       yAxis.selectAll('line')
-        .style('stroke', '#888');
+        .attr('stroke', 'black')
+        .attr('stroke-width', 1.5);
+      yAxis.selectAll('.domain')
+        .attr('stroke', 'black')
+        .attr('stroke-width', 2);
 
-      // Add axis labels
+      // Add title (move down, but enough margin)
       svg.append('text')
         .attr('x', width / 2)
-        .attr('y', height - 10)
+        .attr('y', 40)
         .attr('text-anchor', 'middle')
-        .attr('font-size', '14px')
+        .attr('font-size', '28px')
+        .attr('font-weight', 'bold')
+        .text('Median Household Income Trend (2013-2023)');
+
+      // Add x axis label (move even lower)
+      g.append('text')
+        .attr('x', innerWidth / 2)
+        .attr('y', innerHeight + 80) // was +60
+        .attr('text-anchor', 'middle')
+        .attr('font-size', '16px')
         .text('Year');
 
-      svg.append('text')
+      // Add y axis label (move even further left)
+      g.append('text')
         .attr('transform', 'rotate(-90)')
-        .attr('x', -height / 2)
-        .attr('y', 35)
+        .attr('x', -innerHeight / 2)
+        .attr('y', -90) // was -70
         .attr('text-anchor', 'middle')
-        .attr('font-size', '14px')
+        .attr('font-size', '16px')
         .text('Median Household Income');
-
-      // Add title
-      svg.append('text')
-        .attr('x', width / 2)
-        .attr('y', 25)
-        .attr('text-anchor', 'middle')
-        .attr('font-size', '18px')
-        .attr('font-weight', 'bold')
-        .text('Median Household Income Trend (2019-2023)');
     };
 
     createChart(data);
