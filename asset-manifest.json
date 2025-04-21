@@ -1,30 +1,15 @@
 {
   "files": {
     "main.css": "/health-and-income/static/css/main.8b9a18e7.css",
-    "main.js": "/health-and-income/static/js/main.1052af1c.js",
+    "main.js": "/health-and-income/static/js/main.6cfbb458.js",
     "static/js/453.5fb11916.chunk.js": "/health-and-income/static/js/453.5fb11916.chunk.js",
-    "static/media/GeorgiaIncomeData.csv": "/health-and-income/static/media/GeorgiaIncomeData.e494afa79b9dc4372811.csv",
-    "static/media/income2022.csv": "/health-and-income/static/media/income2022.3db95174e6b6fb73c6da.csv",
-    "static/media/income2023.csv": "/health-and-income/static/media/income2023.1d3d59dcb20748aad3bf.csv",
-    "static/media/income2019.csv": "/health-and-income/static/media/income2019.b2160d3ad1bec564c07a.csv",
-    "static/media/income2021.csv": "/health-and-income/static/media/income2021.cd8c552070dbd951927b.csv",
-    "static/media/income2020.csv": "/health-and-income/static/media/income2020.f3413985ae9d0ab05d5d.csv",
-    "static/media/income2018.csv": "/health-and-income/static/media/income2018.360c1a6259e34e47bd88.csv",
-    "static/media/income2016.csv": "/health-and-income/static/media/income2016.df9f105503027f264873.csv",
-    "static/media/income2017.csv": "/health-and-income/static/media/income2017.5eded79b41d349a9cff6.csv",
-    "static/media/income2013.csv": "/health-and-income/static/media/income2013.54d439aa1414b653ced6.csv",
-    "static/media/income2014.csv": "/health-and-income/static/media/income2014.399b717122d41b3467ad.csv",
-    "static/media/income2015.csv": "/health-and-income/static/media/income2015.ab94bab8baed7ab2f6eb.csv",
-    "static/media/HypertensionCountyData.csv": "/health-and-income/static/media/HypertensionCountyData.2c061966573c1ccc9fe3.csv",
-    "static/media/georgia race population - Sheet1.csv": "/health-and-income/static/media/georgia race population - Sheet1.c14d03ce474c56e267ce.csv",
     "index.html": "/health-and-income/index.html",
-    "static/media/HypertensionHistoricalData.csv": "/health-and-income/static/media/HypertensionHistoricalData.c2b71cd8b74476af359f.csv",
     "main.8b9a18e7.css.map": "/health-and-income/static/css/main.8b9a18e7.css.map",
-    "main.1052af1c.js.map": "/health-and-income/static/js/main.1052af1c.js.map",
+    "main.6cfbb458.js.map": "/health-and-income/static/js/main.6cfbb458.js.map",
     "453.5fb11916.chunk.js.map": "/health-and-income/static/js/453.5fb11916.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.8b9a18e7.css",
-    "static/js/main.1052af1c.js"
+    "static/js/main.6cfbb458.js"
   ]
 }
