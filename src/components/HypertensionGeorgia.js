@@ -71,15 +71,17 @@ const HypertensionGeorgia = () => {
     d3.select(svgRef.current).selectAll("*").remove();
     
     // Map dimensions with increased margins for more spacing
-    const width = 900;
-    const height = 500;
-    const margin = { top: 60, right: 50, bottom: 70, left: 70 };
+    const width = 1200;
+    const height = 700;
+    const margin = { top: 100, right: 50, bottom: 70, left: 70 };
     
     // Create SVG with a background for better contrast with white text
     const svg = d3.select(svgRef.current)
-      .attr('width', width)
+      .attr('width', '100%')
       .attr('height', height)
-      .attr('viewBox', `0 0 ${width} ${height}`);
+      .attr('viewBox', `0 0 ${width} ${height}`)
+      .style('max-width', '100%')
+      .style('height', 'auto');
     
     // Create disease rate lookup for counties
     const rateByCounty = {};
@@ -133,7 +135,8 @@ const HypertensionGeorgia = () => {
           .style("border-radius", "4px")
           .style("padding", "8px")
           .style("pointer-events", "none")
-          .style("opacity", 0);
+          .style("opacity", 0)
+          .style("font-size", "18px");
         
         // Track matching for debugging
         let matchedCounties = 0;
@@ -276,20 +279,21 @@ const HypertensionGeorgia = () => {
         // Add title (positioned higher from the map)
         svg.append("text")
           .attr("x", width / 2)
-          .attr("y", 20)
+          .attr("y", 48)
           .attr("text-anchor", "middle")
-          .style("font-size", "16px")
-          .style("font-weight", "bold")
-          .style("fill", "white")
+          .attr("font-size", "32px")
+          .attr("font-weight", "bold")
+          .attr("fill", "#000")
           .text("Cardiovascular Disease Rates by County in Georgia");
         
         // Add subtitle (with more space between it and the map)
         svg.append("text")
           .attr("x", width / 2)
-          .attr("y", 45)
+          .attr("y", 82)
           .attr("text-anchor", "middle")
-          .style("font-size", "12px")
-          .style("fill", "white")
+          .attr("font-size", "24px")
+          .attr("font-weight", "normal")
+          .attr("fill", "#000")
           .text("Rate per 100,000 population (2019)");
       })
       .catch(err => {
