@@ -13,10 +13,17 @@ const HypertensionChart = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await fetch(getDataPath('HypertensionHistoricalData.csv'));
+        // Get the data path and log it for debugging
+        const dataFilePath = getDataPath('HypertensionHistoricalData.csv');
+        console.log("Attempting to fetch CSV file from:", dataFilePath);
+        
+        // Add a timestamp to avoid caching issues
+        const cacheBuster = `?t=${new Date().getTime()}`;
+        const response = await fetch(`${dataFilePath}${cacheBuster}`);
+        console.log("Fetch response status:", response.status);
         
         if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
+          throw new Error(`HTTP error! Status: ${response.status}, path: ${dataFilePath}`);
         }
         
         const fileContent = await response.text();
@@ -199,10 +206,15 @@ const HypertensionChart = () => {
   
   if (error) {
     return (
-      <div style={{ color: 'red', padding: '20px' }}>
-        <h3>Error loading data</h3>
-        <p>{error}</p>
-        <p>Make sure your CSV file is located at: /public/data/HypertensionHistoricalData.csv</p>
+      <div style={{ padding: '20px', backgroundColor: '#ffeeee', border: '1px solid #ff6666', borderRadius: '5px', margin: '20px auto', maxWidth: '900px' }}>
+        <h3 style={{ color: '#cc0000', fontWeight: 'bold', fontSize: '20px' }}>Error loading data</h3>
+        <p style={{ color: '#333', marginTop: '10px' }}>Error: {error}</p>
+        <div style={{ marginTop: '15px', fontSize: '14px', color: '#555' }}>
+          <p><strong>Current environment:</strong> {window.location.hostname === 'localhost' ? 'Local Development' : 'GitHub Pages'}</p>
+          <p><strong>Attempted data path:</strong> {getDataPath('HypertensionHistoricalData.csv')}</p>
+          <p><strong>Full URL:</strong> {window.location.href}</p>
+          <p><strong>Note:</strong> Please check that your CSV file is in the correct location: /public/data/HypertensionHistoricalData.csv</p>
+        </div>
       </div>
     );
   }
