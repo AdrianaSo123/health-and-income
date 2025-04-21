@@ -76,9 +76,9 @@ const BlackPopulationGeorgia = () => {
     // Clear previous SVG content
     d3.select(svgRef.current).selectAll("*").remove();
     
-    // Map dimensions with increased margins for more spacing
-    const width = 1200;
-    const height = 700;
+    // Map dimensions - reduced for a smaller map
+    const width = 700;
+    const height = 450;
     const margin = { top: 60, right: 50, bottom: 70, left: 70 };
     
     // Create SVG

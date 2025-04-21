@@ -14,11 +14,6 @@ function App() {
         {/* Navigation Bar */}
         <nav className="navbar" role="navigation" aria-label="Main Navigation">
           <span className="navbar-logo">HealthViz</span>
-          <div className="navbar-links">
-            <a className="navbar-link" href="#trends">Trends</a>
-            <a className="navbar-link" href="#maps">Maps</a>
-            <a className="navbar-link" href="#demographics">Demographics</a>
-          </div>
         </nav>
 
         <header className="App-header">
