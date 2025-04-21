@@ -11,12 +11,17 @@ const IncomeGeorgiaMap = () => {
   useEffect(() => {
     const parseCSV = async () => {
       try {
-        console.log("Attempting to fetch CSV file...");
-        const response = await fetch(getDataPath('GeorgiaIncomeData.csv'));
+        // Get the data path and log it for debugging
+        const dataFilePath = getDataPath('GeorgiaIncomeData.csv');
+        console.log("Attempting to fetch CSV file from:", dataFilePath);
+        
+        // Add a timestamp to avoid caching issues
+        const cacheBuster = `?t=${new Date().getTime()}`;
+        const response = await fetch(`${dataFilePath}${cacheBuster}`);
         console.log("Fetch response status:", response.status);
         
         if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+          throw new Error(`HTTP error! status: ${response.status}, path: ${dataFilePath}`);
         }
         
         const csvText = await response.text();
@@ -341,11 +346,15 @@ const IncomeGeorgiaMap = () => {
     <div className="w-full flex flex-col items-center">
       {loading && <p className="text-white">Loading data...</p>}
       {error && (
-        <div className="chart-container" style={{ margin: '20px auto', maxWidth: '900px' }}>
-          <p className="text-red-500 font-bold">Error: {error}</p>
-          <p className="text-white text-sm mt-2">
-            Please check that your CSV file is in the correct location: /public/data/GeorgiaIncomeData.csv
-          </p>
+        <div className="chart-container" style={{ margin: '20px auto', maxWidth: '900px', padding: '20px', backgroundColor: '#ffeeee', border: '1px solid #ff6666', borderRadius: '5px' }}>
+          <h3 style={{ color: '#cc0000', fontWeight: 'bold', fontSize: '20px' }}>Error loading data</h3>
+          <p style={{ color: '#333', marginTop: '10px' }}>Error: {error}</p>
+          <div style={{ marginTop: '15px', fontSize: '14px', color: '#555' }}>
+            <p><strong>Current environment:</strong> {window.location.hostname === 'localhost' ? 'Local Development' : 'GitHub Pages'}</p>
+            <p><strong>Attempted data path:</strong> {getDataPath('GeorgiaIncomeData.csv')}</p>
+            <p><strong>Full URL:</strong> {window.location.href}</p>
+            <p><strong>Note:</strong> Please check that your CSV file is in the correct location: /public/data/GeorgiaIncomeData.csv</p>
+          </div>
         </div>
       )}
       <svg ref={svgRef} width="900" height="500"></svg>
