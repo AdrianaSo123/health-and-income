@@ -1,4 +1,28 @@
-# Getting Started with Create React App
+# HealthViz - Income and Cardiovascular Disease Analysis
+
+## Project Overview
+
+HealthViz is a data visualization project that explores the relationship between income levels and cardiovascular disease rates across Georgia counties. This interactive web application presents multiple visualizations to help users understand the correlation between socioeconomic factors and health outcomes.
+
+## Live Demo
+
+View the live application: [https://AdrianaSo123.github.io/health-and-income/](https://AdrianaSo123.github.io/health-and-income/)
+
+## Key Features
+
+- **Income Georgia Map**: Visualizes median family income by county across Georgia
+- **Hypertension Georgia Map**: Shows hypertension rates by county
+- **Income vs. Cardiovascular Disease**: Explores the correlation between income and cardiovascular disease rates
+- **Median Income Trend**: Displays historical trends in median income
+- **Hypertension Trend**: Shows trends in hypertension rates over time
+- **Race Demographics Map**: Visualizes Black population demographics by county
+
+## Technologies Used
+
+- React.js
+- D3.js for data visualization
+- CSV data processing
+- GitHub Pages for deployment
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
