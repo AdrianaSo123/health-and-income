@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
+import getDataPath from '../utils/dataPath';
 
 const IncomeVsCardioGeorgia = () => {
   const svgRef = useRef(null);
@@ -15,9 +16,9 @@ const IncomeVsCardioGeorgia = () => {
       try {
         setIsLoading(true);
         
-        // Define fixed file paths
-        const incomePath = '/data/GeorgiaIncomeData.csv';
-        const hypertensionPath = '/data/HypertensionCountyData.csv';
+        // Define file paths using utility function
+        const incomePath = getDataPath('GeorgiaIncomeData.csv');
+        const hypertensionPath = getDataPath('HypertensionCountyData.csv');
         
         // Fetch both CSV files
         const responses = await Promise.all([

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import Papa from 'papaparse';
+import getDataPath from '../utils/dataPath';
 
 const BlackPopulationGeorgia = () => {
   const svgRef = useRef(null);
@@ -13,7 +14,7 @@ const BlackPopulationGeorgia = () => {
       try {
         console.log("Attempting to fetch CSV file...");
         // For deployment, the file should be in the public directory
-        const response = await fetch('/data/georgia race population - Sheet1.csv');
+        const response = await fetch(getDataPath('georgia race population - Sheet1.csv'));
         console.log("Fetch response status:", response.status);
         
         if (!response.ok) {

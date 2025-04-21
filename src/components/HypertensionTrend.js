@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import Papa from 'papaparse';
+import getDataPath from '../utils/dataPath';
 
 const HypertensionChart = () => {
   const svgRef = useRef();
@@ -12,7 +13,7 @@ const HypertensionChart = () => {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const response = await fetch('/data/HypertensionHistoricalData.csv');
+        const response = await fetch(getDataPath('HypertensionHistoricalData.csv'));
         
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);

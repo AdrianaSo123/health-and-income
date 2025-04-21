@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
+import getDataPath from '../utils/dataPath';
 
 const IncomeGeorgiaMap = () => {
   const svgRef = useRef(null);
@@ -11,7 +12,7 @@ const IncomeGeorgiaMap = () => {
     const parseCSV = async () => {
       try {
         console.log("Attempting to fetch CSV file...");
-        const response = await fetch('/data/GeorgiaIncomeData.csv');
+        const response = await fetch(getDataPath('GeorgiaIncomeData.csv'));
         console.log("Fetch response status:", response.status);
         
         if (!response.ok) {
