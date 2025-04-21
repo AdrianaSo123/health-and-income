@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import Papa from 'papaparse';
-import getDataPath from '../utils/dataPath';
+import getDataContent from '../utils/dataPath';
 
 const HypertensionChart = () => {
   const svgRef = useRef();
@@ -15,7 +15,7 @@ const HypertensionChart = () => {
       try {
         // Get the CSV content directly from our utility
         console.log("Getting Hypertension Historical data directly");
-        const fileContent = getDataPath('HypertensionHistoricalData.csv');
+        const fileContent = getDataContent('HypertensionHistoricalData.csv');
         console.log("CSV data loaded, length:", fileContent.length);
         
         // Parse CSV data

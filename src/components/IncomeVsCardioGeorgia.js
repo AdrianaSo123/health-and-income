@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import getDataPath from '../utils/dataPath';
+import getDataContent from '../utils/dataPath';
 
 const IncomeVsCardioGeorgia = () => {
   const svgRef = useRef(null);
@@ -18,8 +18,8 @@ const IncomeVsCardioGeorgia = () => {
         
         // Get the CSV content directly from our utility
         console.log("Getting Income and Hypertension data directly");
-        const incomeText = getDataPath('GeorgiaIncomeData.csv');
-        const hypertensionText = getDataPath('HypertensionCountyData.csv');
+        const incomeText = getDataContent('GeorgiaIncomeData.csv');
+        const hypertensionText = getDataContent('HypertensionCountyData.csv');
         
         console.log("Income data loaded, length:", incomeText.length);
         console.log("Hypertension data loaded, length:", hypertensionText.length);
