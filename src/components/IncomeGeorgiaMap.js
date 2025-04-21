@@ -23,58 +23,59 @@ const IncomeGeorgiaMap = () => {
         console.log("CSV loaded, length:", csvText.length);
         console.log("First 100 chars:", csvText.substring(0, 100));
         
-        // Simple parsing approach
+        // More reliable CSV parsing approach
         const extractedData = [];
-        const lines = csvText.split('\n').filter(line => line.trim());
         
-        // Process each line
-        for (const line of lines) {
-          // Only look for county data lines
-          if (line.includes('County') && !line.includes('Georgia,') && !line.includes('United States,')) {
-            // Simple CSV parsing with handling for quotes
-            const parts = [];
-            let currentPart = '';
-            let inQuotes = false;
+        // Skip the first 3 lines (headers)
+        const dataLines = csvText.split('\n').slice(3).filter(line => line.trim());
+        
+        for (const line of dataLines) {
+          // Skip non-county lines
+          if (!line.includes('County')) continue;
+          if (line.includes('Georgia,') || line.includes('United States,')) continue;
+          
+          // Parse the CSV line
+          const parts = [];
+          let currentPart = '';
+          let inQuotes = false;
+          
+          for (let i = 0; i < line.length; i++) {
+            const char = line[i];
             
-            for (let i = 0; i < line.length; i++) {
-              const char = line[i];
-              
-              if (char === '"') {
-                inQuotes = !inQuotes;
-              } else if (char === ',' && !inQuotes) {
-                parts.push(currentPart);
-                currentPart = '';
-              } else {
-                currentPart += char;
-              }
+            if (char === '"') {
+              inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+              parts.push(currentPart);
+              currentPart = '';
+            } else {
+              currentPart += char;
             }
+          }
+          
+          // Add the last part
+          parts.push(currentPart);
+          
+          // Clean the parts
+          const cleanParts = parts.map(part => part.replace(/"/g, '').trim());
+          
+          // Extract county name and income
+          if (cleanParts.length >= 3) {
+            const countyName = cleanParts[0];
             
-            // Don't forget the last part
-            parts.push(currentPart);
+            // Get income value from the 3rd column (index 2)
+            const incomeStr = cleanParts[2].replace(/[^0-9.]/g, '');
+            const income = parseFloat(incomeStr);
             
-            // Clean the parts
-            const cleanParts = parts.map(part => part.replace(/"/g, '').trim());
-            
-            let countyName = cleanParts[0];
-            
-            // Skip if header row
-            if (countyName === 'County') continue;
-            
-            // Get income value from 3rd column
-            if (cleanParts.length >= 3) {
-              // Remove quotes, commas and other non-numeric chars from value
-              const incomeStr = cleanParts[2].replace(/[^0-9.]/g, '');
-              const income = parseFloat(incomeStr);
+            if (!isNaN(income) && income > 0) {
+              // Remove "County" suffix for better mapping
+              const mappingName = countyName.replace(/ County$/i, '');
               
-              if (!isNaN(income) && income > 0) {
-                // Remove "County" suffix for better mapping
-                const mappingName = countyName.replace(/ County$/i, '');
-                
-                extractedData.push({
-                  county: mappingName,
-                  median_income: income
-                });
-              }
+              console.log(`Parsed county: ${mappingName}, income: ${income}`);
+              
+              extractedData.push({
+                county: mappingName,
+                median_income: income
+              });
             }
           }
         }
