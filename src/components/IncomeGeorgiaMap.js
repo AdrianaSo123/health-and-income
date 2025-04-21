@@ -341,7 +341,7 @@ const IncomeGeorgiaMap = () => {
           <p style={{ color: '#333', marginTop: '10px' }}>Error: {error}</p>
           <div style={{ marginTop: '15px', fontSize: '14px', color: '#555' }}>
             <p><strong>Current environment:</strong> {window.location.hostname === 'localhost' ? 'Local Development' : 'GitHub Pages'}</p>
-            <p><strong>Attempted data path:</strong> {getDataPath('GeorgiaIncomeData.csv')}</p>
+            <p><strong>Data file:</strong> GeorgiaIncomeData.csv</p>
             <p><strong>Full URL:</strong> {window.location.href}</p>
             <p><strong>Note:</strong> Please check that your CSV file is in the correct location: /public/data/GeorgiaIncomeData.csv</p>
           </div>
