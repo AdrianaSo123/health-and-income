@@ -5,183 +5,189 @@
 
 // Georgia Income Data
 export const georgiaIncomeData = `
-"Data table for Figure 4. Age-adjusted trend in hypertension prevalence among adults aged 18 and over, by sex: United States, 1999–2018",,,
-,Percent (standard error),,
-Survey Period ,All,Men ,Women
-1999-2000,47.0 (1.4),51.7 (1.8),42.0 (1.5)
-2001-2002,46.0 (1.3),50.2 (2.1),41.5 (1.2)
-2003-2004,44.9 (1.3),49.1 (1.7),40.3 (1.2)
-2005-2006,43.8 (1.1),48.1 (1.4),39.0 (1.2)
-2007-2008,43.2 (0.9),46.8 (1.0),39.5 (1.1)
-2009-2010,42.1 (1.2),45.5 (1.7),38.4 (1.0)
-2011-2012,43.9 (0.9),47.7 (1.4),39.9 (1.1)
-2013-2014,41.7 (0.8) ,45.2 (1.3),38.2 (1.1)
-2015-2016,45.4 (1.0),48.2 (1.4),42.8 (1.3)
-2017-2018,45.4 (1.1),51.0 (1.4),40.2 (1.4)
+Income (Median family income) for Georgia by County
+"All Races (includes Hispanic/Latino), Both Sexes, All Ages, 2019-2023"
+Sorted by Value
+
+County,FIPS,Value (Dollars),Rank within US (of 3139 counties)
+"Georgia",13000,"90,337","33 of 52"
+"United States",00000,"96,922","N/A"
+"Randolph County",13243,"39,353","3,128"
+"Atkinson County",13003,"44,737","3,111"
+"Ben Hill County",13017,"47,699","3,096"
+"Baker County",13007,"50,682","3,060"
+"Jeff Davis County",13161,"51,290","3,054"
+"Stewart County",13259,"51,806","3,046"
+"Jenkins County",13165,"52,146","3,040"
+"Webster County",13307,"52,500","3,035"
+"Hancock County",13141,"52,730","3,031"
+"Sumter County",13261,"53,246","3,023"
+"Taliaferro County",13265,"53,523","3,020"
+"Appling County",13001,"53,535","3,018"
+"Charlton County",13049,"55,139","2,991"
 `;
 
 // Hypertension County Data
 export const hypertensionCountyData = `
-County,Hypertension Rate
-Appling,38.2
-Atkinson,37.5
-Bacon,38.4
-Baker,39.1
-Baldwin,36.8
-Banks,35.9
-Barrow,34.7
-Bartow,35.2
-Ben Hill,38.6
-Berrien,37.9
-Bibb,37.3
-Bleckley,38.1
-Brantley,38.4
-Brooks,38.7
-Bryan,33.6
-Bulloch,34.5
-Burke,38.2
-Butts,36.8
-Calhoun,39.3
-Camden,34.2
-Candler,37.8
-Carroll,35.6
-Catoosa,35.4
-Charlton,38.1
-Chatham,35.8
-Chattahoochee,34.9
-Chattooga,37.6
-Cherokee,33.1
-Clarke,33.5
-Clay,39.5
-Clayton,36.2
-Clinch,38.3
-Cobb,32.4
-Coffee,37.9
-Colquitt,37.8
-Columbia,33.8
-Cook,37.8
-Coweta,34.1
-Crawford,37.2
-Crisp,38.5
-Dade,36.3
-Dawson,34.7
-Decatur,38.2
-DeKalb,33.5
-Dodge,38.3
-Dooly,38.7
-Dougherty,38.9
-Douglas,34.8
-Early,39.1
-Echols,37.2
-Effingham,34.6
-Elbert,37.8
-Emanuel,38.1
-Evans,37.9
-Fannin,36.4
-Fayette,33.2
-Floyd,36.5
-Forsyth,31.8
-Franklin,36.7
-Fulton,32.9
-Gilmer,36.1
-Glascock,37.9
-Glynn,36.2
-Gordon,35.8
-Grady,38.1
-Greene,36.9
-Gwinnett,32.1
-Habersham,35.9
-Hall,33.7
-Hancock,39.2
-Haralson,36.4
-Harris,34.7
-Hart,36.8
-Heard,36.7
-Henry,34.2
-Houston,35.1
-Irwin,38.2
-Jackson,35.3
-Jasper,36.7
-Jeff Davis,38.1
-Jefferson,38.4
-Jenkins,38.5
-Johnson,38.2
-Jones,36.4
-Lamar,37.1
-Lanier,37.6
-Laurens,37.6
-Lee,35.2
-Liberty,35.3
-Lincoln,37.5
-Long,36.1
-Lowndes,36.1
-Lumpkin,35.2
-Macon,38.9
-Madison,36.1
-Marion,38.2
-McDuffie,37.6
-McIntosh,37.4
-Meriwether,37.9
-Miller,38.7
-Mitchell,38.6
-Monroe,36.1
-Montgomery,37.9
-Morgan,36.2
-Murray,36.1
-Muscogee,36.5
-Newton,35.4
-Oconee,33.4
-Oglethorpe,36.3
-Paulding,34.1
-Peach,37.1
-Pickens,35.6
-Pierce,38.1
-Pike,36.2
-Polk,36.8
-Pulaski,38.1
-Putnam,36.7
-Quitman,39.4
-Rabun,36.2
-Randolph,39.2
-Richmond,37.1
-Rockdale,35.1
-Schley,37.6
-Screven,38.2
-Seminole,38.8
-Spalding,36.9
-Stephens,36.5
-Stewart,39.1
-Sumter,38.4
-Talbot,38.7
-Taliaferro,38.9
-Tattnall,37.6
-Taylor,38.4
-Telfair,38.5
-Terrell,39.1
-Thomas,37.8
-Tift,37.4
-Toombs,37.8
-Towns,36.3
-Treutlen,38.1
-Troup,36.4
-Turner,38.5
-Twiggs,38.2
-Union,36.1
-Upson,37.5
-Walker,36.2
-Walton,35.1
-Ware,38.1
-Warren,38.7
-Washington,38.2
-Wayne,37.6
-Webster,38.6
-Wheeler,38.3
-White,35.6
-Whitfield,35.4
-Wilcox,38.5
-Wilkes,37.9
-Wilkinson,38.1
-Worth,38.3
+County,HypertensionRate
+Appling,114.8
+Atkinson,61.7
+Bacon,86.0
+Baker,62.1
+Baldwin,138.7
+Banks,67.8
+Barrow,56.5
+Bartow,104.0
+Ben Hill,90.0
+Berrien,82.2
+Bibb,52.2
+Bleckley,55.8
+Brantley,56.8
+Brooks,86.0
+Bryan,65.4
+Bulloch,94.8
+Burke,118.2
+Butts,110.4
+Calhoun,120.2
+Camden,82.7
+Candler,88.8
+Carroll,74.8
+Catoosa,47.4
+Charlton,47.7
+Chatham,91.3
+Chattahoochee,85.3
+Chattooga,79.4
+Cherokee,42.4
+Clarke,60.5
+Clay,86.5
+Clayton,86.5
+Clinch,34.4
+Cobb,33.4
+Coffee,74.4
+Colquitt,98.1
+Columbia,43.1
+Cook,81.9
+Coweta,75.2
+Crawford,52.5
+Crisp,74.5
+Dade,47.4
+Dawson,64.2
+Decatur,86.3
+DeKalb,54.4
+Dodge,62.7
+Dooly,34.2
+Dougherty,93.4
+Douglas,62.4
+Early,168.6
+Echols,42.1
+Effingham,73.3
+Elbert,73.1
+Emanuel,126.4
+Evans,79.7
+Fannin,62.2
+Fayette,31.6
+Floyd,126.3
+Forsyth,33.2
+Franklin,99.9
+Fulton,63.4
+Gilmer,72.2
+Glascock,144.4
+Glynn,46.2
+Gordon,76.4
+Grady,70.4
+Greene,68.7
+Gwinnett,28.3
+Habersham,44.6
+Hall,41.8
+Hancock,81.3
+Haralson,109.3
+Harris,64.2
+Hart,72.0
+Heard,103.3
+Henry,64.1
+Houston,40.5
+Irwin,87.4
+Jackson,74.3
+Jasper,37.5
+Jeff Davis,87.5
+Jefferson,190.5
+Jenkins,106.7
+Johnson,99.8
+Jones,49.9
+Lamar,80.0
+Lanier,59.7
+Laurens,129.0
+Lee,38.8
+Liberty,73.9
+Lincoln,78.0
+Long,47.4
+Lowndes,117.3
+Lumpkin,50.4
+McDuffie,128.3
+McIntosh,70.9
+Macon,109.2
+Madison,69.5
+Marion,64.5
+Meriwether,154.4
+Miller,79.3
+Mitchell,95.1
+Monroe,55.2
+Montgomery,68.5
+Morgan,51.4
+Murray,79.1
+Muscogee,111.7
+Newton,61.7
+Oconee,33.2
+Oglethorpe,43.0
+Paulding,53.3
+Peach,66.8
+Pickens,64.1
+Pierce,65.9
+Pike,64.5
+Polk,69.3
+Pulaski,59.1
+Putnam,98.4
+Quitman,109.8
+Rabun,38.3
+Randolph,136.0
+Richmond,130.1
+Rockdale,48.2
+Screven,83.4
+Seminole,55.8
+Spalding,74.9
+Stephens,90.4
+Stewart,95.9
+Sumter,74.6
+Talbot,96.3
+Taliaferro,89.3
+Tattnall,105.8
+Taylor,86.8
+Telfair,49.1
+Terrell,102.1
+Thomas,80.6
+Tift,150.1
+Toombs,78.6
+Towns,73.4
+Treutlen,57.4
+Troup,121.2
+Turner,123.7
+Twiggs,72.9
+Union,27.5
+Upson,96.5
+Walker,51.7
+Walton,61.2
+Ware,109.5
+Warren,100.1
+Washington,86.7
+Wayne,77.9
+Webster,84.1
+Wheeler,49.1
+White,45.7
+Whitfield,55.1
+Wilcox,74.2
+Wilkes,71.6
+Wilkinson,85.0
+Worth,82.8
 `;
 
 // Hypertension Historical Data
@@ -203,16 +209,16 @@ Survey Period ,All,Men ,Women
 
 // Georgia Race Population Data
 export const georgiaRacePopulationData = `
-County,Black Population Percentage
-Appling,18.5
-Atkinson,15.2
-Bacon,14.1
-Baker,47.9
-Baldwin,41.5
-Banks,3.4
-Barrow,13.3
-Bartow,10.3
-Ben Hill,36.2
+County,Value
+Appling,19.6
+Atkinson,17.1
+Bacon,16.7
+Baker,44.9
+Baldwin,42.6
+Banks,2.8
+Barrow,12.5
+Bartow,11.3
+Ben Hill,36.1
 Berrien,14.6
 Bibb,54.8
 Bleckley,25.6
