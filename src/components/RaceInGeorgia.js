@@ -38,12 +38,35 @@ const BlackPopulationGeorgia = () => {
             }
             
             // Extract county and black population percentage data
-            // Assuming the CSV has columns 'County' and 'Value' or similar
-            // Adjust field names as needed based on your actual CSV structure
-            const extractedData = results.data.map(row => ({
-              county: row.County || '',
-              value: parseFloat(row.Value || 0)
-            })).filter(item => item.county && !isNaN(item.value));
+            const extractedData = [];
+            
+            // Process each row in the parsed data
+            for (const row of results.data) {
+              // Skip empty rows or header rows
+              if (!row || !Object.keys(row).length) continue;
+              
+              // Try to find the county and value columns
+              let countyName = '';
+              let value = 0;
+              
+              // Look for columns that might contain county and value data
+              Object.entries(row).forEach(([key, val]) => {
+                if (typeof val === 'string' && val.includes('County')) {
+                  countyName = val.trim();
+                } else if (!isNaN(parseFloat(val))) {
+                  value = parseFloat(val);
+                }
+              });
+              
+              // If we found both county and value, add to extracted data
+              if (countyName && !isNaN(value) && value > 0) {
+                console.log(`Parsed county: ${countyName}, value: ${value}`);
+                extractedData.push({
+                  county: countyName,
+                  value: value
+                });
+              }
+            }
             
             console.log(`Extracted ${extractedData.length} counties`);
             console.log("Sample counties:", extractedData.slice(0, 3));

@@ -23,21 +23,44 @@ const HypertensionGeorgia = () => {
         console.log("CSV loaded, length:", csvText.length);
         console.log("First 100 chars:", csvText.substring(0, 100));
         
-        // Parse CSV data
+        // More reliable CSV parsing approach
         const extractedData = [];
-        const lines = csvText.split('\n').filter(line => line.trim());
         
-        // Skip header line
-        for (let i = 1; i < lines.length; i++) {
-          const line = lines[i];
-          const parts = line.split(',');
+        // Skip the first line (header)
+        const dataLines = csvText.split('\n').slice(1).filter(line => line.trim());
+        
+        for (const line of dataLines) {
+          // Parse the CSV line
+          const parts = [];
+          let currentPart = '';
+          let inQuotes = false;
           
-          if (parts.length >= 2) {
-            const countyName = parts[0].trim();
-            const rateStr = parts[1].trim();
-            const rate = parseFloat(rateStr);
+          for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            
+            if (char === '"') {
+              inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+              parts.push(currentPart);
+              currentPart = '';
+            } else {
+              currentPart += char;
+            }
+          }
+          
+          // Add the last part
+          parts.push(currentPart);
+          
+          // Clean the parts
+          const cleanParts = parts.map(part => part.replace(/"/g, '').trim());
+          
+          if (cleanParts.length >= 2) {
+            const countyName = cleanParts[0];
+            const rate = parseFloat(cleanParts[1]);
             
             if (!isNaN(rate) && rate > 0) {
+              console.log(`Parsed county: ${countyName}, rate: ${rate}`);
+              
               extractedData.push({
                 county: countyName,
                 disease_rate: rate

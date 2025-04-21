@@ -91,32 +91,53 @@ const IncomeVsCardioGeorgia = () => {
           
           // Extract income value
           const incomeStr = parts[2].replace(/["']/g, '').replace(/,/g, '');
-          const income = parseFloat(incomeStr) / 1000; // Convert to thousands
+          const income = parseFloat(incomeStr);
           
-          if (!isNaN(income)) {
+          if (!isNaN(income) && income > 0) {
             incomeData[county] = income;
+            console.log(`Income data: ${county} = ${income}`);
           }
         }
         
-        console.log("Processed income data:", Object.keys(incomeData).length, "counties");
-        
-        // Process hypertension data
+        // Process hypertension data with more reliable parsing
         const hypertensionData = {};
-        const hypertensionLines = hypertensionText.split('\n');
+        const hypertensionLines = hypertensionText.split('\n').slice(1); // Skip header line
         
-        // Skip header
-        for (let i = 1; i < hypertensionLines.length; i++) {
-          const line = hypertensionLines[i].trim();
-          if (line === '') continue;
+        for (const line of hypertensionLines) {
+          // Parse the CSV line
+          const parts = [];
+          let currentPart = '';
+          let inQuotes = false;
           
-          const parts = line.split(',');
-          if (parts.length < 2) continue;
+          for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            
+            if (char === '"') {
+              inQuotes = !inQuotes;
+            } else if (char === ',' && !inQuotes) {
+              parts.push(currentPart);
+              currentPart = '';
+            } else {
+              currentPart += char;
+            }
+          }
           
-          const county = parts[0];
-          const rate = parseFloat(parts[1]);
+          // Add the last part
+          parts.push(currentPart);
           
-          if (!isNaN(rate)) {
-            hypertensionData[county] = rate;
+          // Clean the parts
+          const cleanParts = parts.map(part => part.replace(/"/g, '').trim());
+          
+          if (cleanParts.length >= 2) {
+            const countyName = cleanParts[0];
+            const rate = parseFloat(cleanParts[1]);
+            
+            if (!isNaN(rate) && rate > 0) {
+              // Remove "County" suffix for better mapping
+              const mappingName = countyName.replace(/ County$/i, '');
+              hypertensionData[mappingName] = rate;
+              console.log(`Hypertension data: ${mappingName} = ${rate}`);
+            }
           }
         }
         
