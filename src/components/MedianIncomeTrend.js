@@ -48,8 +48,7 @@ const MedianIncomeTrend = () => {
         .range([0, innerWidth])
         .padding(0.2);
 
-      // Restore y-axis to original logic
-      const maxIncome = d3.max(data, d => d.income);
+      // Get min income for y-axis calculation
       const minIncome = d3.min(data, d => d.income);
       // Set y-axis domain to end at 80,000
       const yAxisMax = 80000;
