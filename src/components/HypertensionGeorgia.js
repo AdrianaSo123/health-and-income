@@ -15,7 +15,6 @@ const HypertensionGeorgia = () => {
         console.log("Getting Hypertension County data directly");
         const csvText = getDataContent('HypertensionCountyData.csv');
         console.log("CSV data loaded, length:", csvText.length);
-        console.log("CSV loaded, length:", csvText.length);
         console.log("First 100 chars:", csvText.substring(0, 100));
         
         // More reliable CSV parsing approach

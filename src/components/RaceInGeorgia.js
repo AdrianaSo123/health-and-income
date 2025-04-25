@@ -36,30 +36,17 @@ const BlackPopulationGeorgia = () => {
             
             // Process each row in the parsed data
             for (const row of results.data) {
-              // Skip empty rows or header rows
-              if (!row || !Object.keys(row).length) continue;
-              
-              // Try to find the county and value columns
-              let countyName = '';
-              let value = 0;
-              
-              // Look for columns that might contain county and value data
-              Object.entries(row).forEach(([key, val]) => {
-                if (typeof val === 'string' && val.includes('County')) {
-                  countyName = val.trim();
-                } else if (!isNaN(parseFloat(val))) {
-                  value = parseFloat(val);
-                }
+              // Skip empty rows or rows with missing data
+              if (!row || !row.County || isNaN(parseFloat(row.Value))) continue;
+
+              // Capitalize county name and parse value
+              const countyName = row.County.trim().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+              const value = parseFloat(row.Value);
+
+              extractedData.push({
+                county: countyName,
+                value: value
               });
-              
-              // If we found both county and value, add to extracted data
-              if (countyName && !isNaN(value) && value > 0) {
-                console.log(`Parsed county: ${countyName}, value: ${value}`);
-                extractedData.push({
-                  county: countyName,
-                  value: value
-                });
-              }
             }
             
             console.log(`Extracted ${extractedData.length} counties`);

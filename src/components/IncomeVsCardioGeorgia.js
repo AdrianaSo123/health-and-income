@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
+import Papa from 'papaparse';
 import getDataContent from '../utils/dataPath';
 
 const IncomeVsCardioGeorgia = () => {
@@ -18,73 +19,38 @@ const IncomeVsCardioGeorgia = () => {
         
         // Get the CSV content directly from our utility
         console.log("Getting Income and Hypertension data directly");
-        const incomeText = getDataContent('GeorgiaIncomeData.csv');
+        // eslint-disable-next-line import/no-webpack-loader-syntax
+        let incomeText = require('!!raw-loader!../data/GeorgiaIncomeData.csv').default;
+        console.log("First 300 chars of incomeText:", incomeText && incomeText.substring(0, 300));
+        // Skip metadata lines at the top
+        const incomeLines = incomeText.split('\n');
+        // Find the header row (first line that starts with 'County,FIPS,Value (Dollars)')
+        const headerIdx = incomeLines.findIndex(line => line.trim().startsWith('County,FIPS,Value (Dollars)'));
+        if (headerIdx === -1) throw new Error('Could not find header row in income CSV');
+        incomeText = incomeLines.slice(headerIdx).join('\n');
         const hypertensionText = getDataContent('HypertensionCountyData.csv');
+        console.log('Hypertension CSV text length:', hypertensionText && hypertensionText.length);
+        console.log('First 200 chars of hypertension CSV:', hypertensionText && hypertensionText.substring(0, 200));
         
         console.log("Income data loaded, length:", incomeText.length);
         console.log("Hypertension data loaded, length:", hypertensionText.length);
         
-        // Process income data
+        // Process income data using PapaParse for robust CSV parsing
         const incomeData = {};
-        const incomeLines = incomeText.split('\n');
-        
-        // Find data rows (skip headers)
-        let dataStarted = false;
-        
-        for (const line of incomeLines) {
-          // Skip empty lines
-          if (line.trim() === '') continue;
-          
-          // Look for start of data
-          if (line.includes("County,FIPS,Value (Dollars)")) {
-            dataStarted = true;
-            continue;
-          }
-          
-          if (!dataStarted) continue;
-          
-          // Skip footer notes
-          if (line.startsWith('Suggested') || line.startsWith('Notes:')) {
-            break;
-          }
-          
-          // Split the line by comma, handling quotes
-          let parts = [];
-          let currentPart = '';
-          let inQuotes = false;
-          
-          for (let i = 0; i < line.length; i++) {
-            if (line[i] === '"') {
-              inQuotes = !inQuotes;
-            } else if (line[i] === ',' && !inQuotes) {
-              parts.push(currentPart);
-              currentPart = '';
-            } else {
-              currentPart += line[i];
-            }
-          }
-          
-          // Add the last part
-          parts.push(currentPart);
-          
-          // Extract county name and value
-          let county = parts[0].replace(/["']/g, '');
-          
-          // Skip United States and Georgia rows
-          if (county === 'United States' || county === 'Georgia') continue;
-          
-          // Remove " County" suffix if present
-          county = county.replace(/ County$/, '');
-          
-          // Extract income value
-          const incomeStr = parts[2].replace(/["']/g, '').replace(/,/g, '');
+        const parsed = Papa.parse(incomeText, {
+          header: true,
+          skipEmptyLines: true
+        });
+        parsed.data.forEach(row => {
+          let county = row['County'] ? row['County'].replace(/"/g, '').replace(' County', '').trim() : '';
+          if (county === 'United States' || county === 'Georgia' || !county) return;
+          let incomeStr = row['Value (Dollars)'] ? row['Value (Dollars)'].replace(/"/g, '').replace(/,/g, '') : '';
           const income = parseFloat(incomeStr);
-          
           if (!isNaN(income) && income > 0) {
             incomeData[county] = income;
-            console.log(`Income data: ${county} = ${income}`);
+            // Optionally log: console.log(`Income data: ${county} = ${income}`);
           }
-        }
+        });
         
         // Process hypertension data with more reliable parsing
         const hypertensionData = {};
@@ -130,19 +96,58 @@ const IncomeVsCardioGeorgia = () => {
         
         console.log("Processed hypertension data:", Object.keys(hypertensionData).length, "counties");
         
-        // Combine data
+        // --- Normalize and capitalize county names for robust joining ---
+        function normalizeCounty(name) {
+          return name
+            .toLowerCase()
+            .replace(/county/g, '')
+            .replace(/[^a-z0-9]/g, '') // remove all non-alphanumeric
+            .trim();
+        }
+        function capitalizeCounty(name) {
+          return name.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        }
+
+        // Build normalized maps
+        const normIncomeData = {};
+        Object.entries(incomeData).forEach(([county, val]) => {
+          normIncomeData[normalizeCounty(county)] = { val, original: county };
+        });
+        const normHypertensionData = {};
+        Object.entries(hypertensionData).forEach(([county, val]) => {
+          normHypertensionData[normalizeCounty(county)] = { val, original: county };
+        });
+
+        // Debug: print sample normalized keys and values (capitalized for counties)
+        console.log('Sample normalized income counties:', Object.values(normIncomeData).slice(0, 10).map(e => capitalizeCounty(e.original)));
+        console.log('Sample normalized hypertension counties:', Object.values(normHypertensionData).slice(0, 10).map(e => capitalizeCounty(e.original)));
+        console.log('Sample income values:', Object.values(normIncomeData).slice(0, 10).map(e => e.val));
+        console.log('Sample hypertension values:', Object.values(normHypertensionData).slice(0, 10).map(e => e.val));
+        console.log('Total normalized income counties:', Object.keys(normIncomeData).length);
+        console.log('Total normalized hypertension counties:', Object.keys(normHypertensionData).length);
+
+        // Join on normalized names, and capitalize county names for output
         const chartData = [];
-        
-        Object.keys(incomeData).forEach(county => {
-          if (hypertensionData[county]) {
+        Object.keys(normIncomeData).forEach(normCounty => {
+          if (normHypertensionData[normCounty]) {
+            // Use the original county name from income data, capitalized
+            const originalCounty = normIncomeData[normCounty].original;
             chartData.push({
-              county: county,
-              income: incomeData[county],
-              hypertension: hypertensionData[county]
+              county: capitalizeCounty(originalCounty),
+              income: normIncomeData[normCounty].val,
+              hypertension: normHypertensionData[normCounty].val
             });
           }
         });
-        
+
+        // Debug: log counties missing in either dataset
+        const incomeOnly = Object.keys(normIncomeData).filter(c => !(c in normHypertensionData));
+        const hyperOnly = Object.keys(normHypertensionData).filter(c => !(c in normIncomeData));
+        console.log('Counties in income only:', incomeOnly);
+        console.log('Counties in hypertension only:', hyperOnly);
+
+        // Debug: print sample joined data
+        console.log('Sample joined chartData:', chartData.slice(0, 10));
         console.log("Combined data points:", chartData.length);
         
         if (chartData.length === 0) {

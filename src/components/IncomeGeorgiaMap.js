@@ -11,77 +11,72 @@ const IncomeGeorgiaMap = () => {
   useEffect(() => {
     const parseCSV = async () => {
       try {
-        // Get the CSV content directly from our utility
-        console.log("Getting Georgia Income data directly");
-        const csvText = getDataContent('GeorgiaIncomeData.csv');
+        // Import the CSV data directly as a string using raw-loader
+        // eslint-disable-next-line import/no-webpack-loader-syntax
+        const csvText = require('!!raw-loader!../data/GeorgiaIncomeData.csv').default;
         console.log("CSV data loaded, length:", csvText.length);
-        console.log("CSV loaded, length:", csvText.length);
         console.log("First 100 chars:", csvText.substring(0, 100));
-        
-        // More reliable CSV parsing approach
-        const extractedData = [];
-        
-        // Skip the first 3 lines (headers)
-        const dataLines = csvText.split('\n').slice(3).filter(line => line.trim());
-        
-        for (const line of dataLines) {
-          // Skip non-county lines
-          if (!line.includes('County')) continue;
-          if (line.includes('Georgia,') || line.includes('United States,')) continue;
-          
-          // Parse the CSV line
-          const parts = [];
-          let currentPart = '';
-          let inQuotes = false;
-          
-          for (let i = 0; i < line.length; i++) {
-            const char = line[i];
-            
-            if (char === '"') {
-              inQuotes = !inQuotes;
-            } else if (char === ',' && !inQuotes) {
-              parts.push(currentPart);
-              currentPart = '';
-            } else {
-              currentPart += char;
-            }
-          }
-          
-          // Add the last part
-          parts.push(currentPart);
-          
-          // Clean the parts
-          const cleanParts = parts.map(part => part.replace(/"/g, '').trim());
-          
-          // Extract county name and income
-          if (cleanParts.length >= 3) {
-            const countyName = cleanParts[0];
-            
-            // Get income value from the 3rd column (index 2)
-            const incomeStr = cleanParts[2].replace(/[^0-9.]/g, '');
-            const income = parseFloat(incomeStr);
-            
-            if (!isNaN(income) && income > 0) {
-              // Remove "County" suffix for better mapping
-              const mappingName = countyName.replace(/ County$/i, '');
-              
-              console.log(`Parsed county: ${mappingName}, income: ${income}`);
-              
-              extractedData.push({
-                county: mappingName,
-                median_income: income
-              });
-            }
+
+        // Find the header row robustly (ignore BOM, whitespace, case)
+        const lines = csvText.split('\n');
+        const headerIndex = lines.findIndex(line => {
+          const clean = line.replace(/^\uFEFF/, '').trim().toLowerCase();
+          return clean.startsWith('county,');
+        });
+        if (headerIndex === -1) {
+          // Deep debug: log char codes of first 10 lines
+          lines.slice(0, 10).forEach((line, idx) => {
+            const codes = Array.from(line).map(c => c.charCodeAt(0));
+            console.error(`Line ${idx}:`, line, codes);
+          });
+          console.error('CSV header not found. First 5 lines:', lines.slice(0, 5));
+          throw new Error('CSV header not found');
+        }
+        // Only include lines up to the last valid data row (at least 4 commas)
+        let lastDataIdx = headerIndex;
+        for (let i = headerIndex + 1; i < lines.length; i++) {
+          if ((lines[i].match(/,/g) || []).length >= 3) {
+            lastDataIdx = i;
+          } else {
+            break;
           }
         }
-        
+        const csvData = lines.slice(headerIndex, lastDataIdx + 1).join('\n');
+
+        // Parse CSV using d3.csvParse
+        const parsedRows = d3.csvParse(csvData);
+        if (parsedRows.length === 0) {
+          console.error('CSV parsed but no data rows found. Header:', lines[headerIndex]);
+          throw new Error('CSV parsed but no data rows found');
+        }
+        console.log('CSV header:', lines[headerIndex]);
+        console.log('CSV data rows:', parsedRows.length);
+        const extractedData = [];
+
+        parsedRows.forEach(row => {
+          // Only include rows with a county and a valid income
+          if (!row.County || !row["Value (Dollars)"]) return;
+          if (row.County.includes('Georgia') || row.County.includes('United States')) return;
+
+          const countyName = row.County.replace(/ County$/i, '');
+          const incomeStr = row["Value (Dollars)"].replace(/[^0-9.]/g, '');
+          const income = parseFloat(incomeStr);
+
+          if (!isNaN(income) && income > 0) {
+            extractedData.push({
+              county: countyName,
+              median_income: income
+            });
+          }
+        });
+
         console.log(`Extracted ${extractedData.length} counties`);
         console.log("Sample counties:", extractedData.slice(0, 3));
-        
+
         if (extractedData.length === 0) {
           throw new Error("No county data extracted from CSV");
         }
-        
+
         setCountyData(extractedData);
         setLoading(false);
       } catch (err) {

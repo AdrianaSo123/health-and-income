@@ -59,7 +59,7 @@ const HypertensionChart = () => {
     // Larger, more readable, and consistent chart
     const width = 750;
     const height = 375;
-    const margin = { top: 70, right: 40, bottom: 110, left: 90 };
+    const margin = { top: 70, right: 40, bottom: 150, left: 90 }; // Increased bottom margin
     
     // Calculate inner dimensions
     const innerWidth = width - margin.left - margin.right;
@@ -81,15 +81,18 @@ const HypertensionChart = () => {
                      .range([0, innerWidth])
                      .padding(0.2);
     
-    // Create y scale
+    // Create y scale based on data, with padding
+    const minY = d3.min(data, d => d.value);
+    const maxY = d3.max(data, d => d.value);
+    const yPadding = 2; // percentage points
     const yScale = d3.scaleLinear()
-                     .domain([40, 50])
-                     .range([innerHeight, 0]);
+     .domain([Math.floor(minY - yPadding), Math.ceil(maxY + yPadding)])
+     .range([innerHeight, 0]);
     
     // Add x-axis with rotated labels
     g.append("g")
      .attr("class", "x-axis")
-     .attr("transform", `translate(0,${innerHeight})`)
+     .attr("transform", `translate(0,${innerHeight + 20})`) // Move x-axis lower
      .call(d3.axisBottom(xScale))
      .selectAll("text")
      .attr("transform", "translate(-10,10) rotate(-45)")
