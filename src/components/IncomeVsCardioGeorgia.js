@@ -171,7 +171,8 @@ const IncomeVsCardioGeorgia = () => {
       d3.select(svgRef.current).selectAll("*").remove();
       
       // Create the SVG element
-      const svg = d3.select(svgRef.current);
+      const svg = d3.select(svgRef.current)
+        .style('background', 'var(--background)');
       const width = 900;
       const height = 500;
       const margin = { top: 60, right: 50, bottom: 70, left: 70 };
@@ -200,7 +201,7 @@ const IncomeVsCardioGeorgia = () => {
         .attr("color", "#333") // Make axis darker
         .attr("font-weight", "bold") // Make labels bolder
         .selectAll("line")
-        .attr("stroke", "#333") // Make tick lines darker
+        .attr('stroke', '#FFB43A') // brand accent color (Unified regression color, 2025-04-26)
         .attr("stroke-width", 1.5); // Make tick lines thicker
       
       // Add Y axis with darker color
@@ -209,16 +210,8 @@ const IncomeVsCardioGeorgia = () => {
         .attr("color", "#333") // Make axis darker
         .attr("font-weight", "bold") // Make labels bolder
         .selectAll("line")
-        .attr("stroke", "#333") // Make tick lines darker
+        .attr('stroke', '#FFB43A') // brand accent color (Unified regression color, 2025-04-26)
         .attr("stroke-width", 1.5); // Make tick lines thicker
-      
-      // Add X axis label
-      g.append("text")
-        .attr("x", innerWidth / 2)
-        .attr("y", innerHeight + 40)
-        .attr("text-anchor", "middle")
-        .attr("fill", "#333") // Darker text color
-        .text("Median Household Income (thousands of dollars)");
       
       // Add Y axis label
       g.append("text")
@@ -226,7 +219,7 @@ const IncomeVsCardioGeorgia = () => {
         .attr("x", -innerHeight / 2)
         .attr("y", -50)
         .attr("text-anchor", "middle")
-        .attr("fill", "#333") // Darker text color
+        .attr('fill', 'var(--color-brand-primary)') // brand primary color
         .text("Hypertension Rate");
       
       // Add title
@@ -236,7 +229,7 @@ const IncomeVsCardioGeorgia = () => {
         .attr("text-anchor", "middle")
         .attr("font-size", "16px")
         .attr("font-weight", "bold")
-        .attr("fill", "#333") // Darker text color
+        .attr('fill', 'var(--color-brand-primary)') // brand primary color
         .text("Income vs. Hypertension in Georgia Counties");
       
       // Create a tooltip
@@ -291,7 +284,7 @@ const IncomeVsCardioGeorgia = () => {
         .attr("y1", yScale(y1))
         .attr("x2", xScale(x2))
         .attr("y2", yScale(y2))
-        .attr("stroke", "red")
+        .attr("stroke", "#FFB43A") // brand accent color (Unified regression color, 2025-04-26)
         .attr("stroke-width", 2)
         .attr("stroke-dasharray", "5,5");
       
@@ -350,7 +343,7 @@ const IncomeVsCardioGeorgia = () => {
         })
         .attr("fill", d => {
           // Highlight extreme points and outliers
-          return pointsToLabel.some(p => p.county === d.county) ? "orange" : "steelblue";
+          return pointsToLabel.some(p => p.county === d.county) ? "#FFB43A" : "var(--color-brand-primary)"; // brand primary color
         })
         .attr("opacity", 0.7)
         .attr("stroke", "white")
@@ -398,8 +391,8 @@ const IncomeVsCardioGeorgia = () => {
         .attr("width", 150)
         .attr("height", 80)
         .attr("fill", "white")
-        .attr("stroke", "#333") // Darker border
-        .attr("rx", 5);
+        .attr("stroke", "var(--color-brand-primary)") // brand primary color
+        .attr("rx", 10);
       
       legend.append("text")
         .attr("x", 10)
@@ -409,11 +402,11 @@ const IncomeVsCardioGeorgia = () => {
         .attr("font-size", "12px")
         .attr("fill", "#333"); // Darker text color
       
-      legend.append("circle")
-        .attr("cx", 20)
-        .attr("cy", 40)
-        .attr("r", 5)
-        .attr("fill", "orange");
+      legend.append('circle')
+        .attr('cx', 20)
+        .attr('cy', 40)
+        .attr('r', 7)
+        .attr('fill', 'var(--color-brand-primary)'); // brand primary color
       
       legend.append("text")
         .attr("x", 35)
@@ -426,7 +419,7 @@ const IncomeVsCardioGeorgia = () => {
         .attr("cx", 20)
         .attr("cy", 60)
         .attr("r", 5)
-        .attr("fill", "steelblue");
+        .attr("fill", "var(--color-brand-primary)");
       
       legend.append("text")
         .attr("x", 35)
@@ -459,9 +452,9 @@ const IncomeVsCardioGeorgia = () => {
         style={{
           margin: '0 auto',
           display: 'block',
-          border: '1px solid #ccc',
-          borderRadius: '8px',
-          backgroundColor: '#fff'
+          border: '1px solid #bbb',
+           borderRadius: '12px',
+           background: 'white'
         }}
       ></svg>
       

@@ -1,0 +1,16 @@
+:root {
+  --color-brand-primary: #7F4DE2;
+  --color-brand-accent: #FFB43A;
+  --color-brand-bg: #faf5ff;
+  --color-brand-bg-alt: #e0f2fe;
+  --color-success: #22c55e;
+  --color-error: #ef4444;
+  --color-warning: #f59e0b;
+  --color-grey-100: #f8fafc;
+  --color-grey-200: #e9d5ff;
+  --font-heading: 'IBM Plex Mono', monospace;
+  --font-body: 'Inter', sans-serif;
+  --border-radius: 1.3rem;
+  --max-width: 900px;
+  --section-padding: 2.2rem 2.2rem;
+}

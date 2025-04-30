@@ -93,13 +93,14 @@ const HypertensionGeorgia = () => {
     const height = 700;
     const margin = { top: 100, right: 50, bottom: 70, left: 70 };
     
-    // Create SVG with a background for better contrast with white text
+    // Create SVG with a background for better contrast with brand colors
     const svg = d3.select(svgRef.current)
       .attr('width', '100%')
       .attr('height', height)
       .attr('viewBox', `0 0 ${width} ${height}`)
       .style('max-width', '100%')
-      .style('height', 'auto');
+      .style('height', 'auto')
+      .style('background', 'var(--background)');
     
     // Create disease rate lookup for counties
     const rateByCounty = {};
@@ -147,9 +148,10 @@ const HypertensionGeorgia = () => {
         const tooltip = d3.select("body").append("div")
           .attr("class", "tooltip")
           .style("position", "absolute")
-          .style("background", "rgba(0, 0, 0, 0.8)")
-          .style("color", "white")
-          .style("border", "1px solid #555")
+          .style("background", "var(--color-brand-bg)")
+          .style("color", "var(--color-brand-primary)")
+          .style("font-family", "var(--font-heading)")
+          .style("border", "1px solid var(--color-brand-border)")
           .style("border-radius", "4px")
           .style("padding", "8px")
           .style("pointer-events", "none")

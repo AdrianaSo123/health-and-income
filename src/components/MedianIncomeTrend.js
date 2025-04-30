@@ -85,7 +85,7 @@ const MedianIncomeTrend = () => {
       g.append('path')
         .datum(data)
         .attr('fill', 'none')
-        .attr('stroke', '#228B22') // ForestGreen
+        .attr('stroke', 'var(--color-brand-primary)') // Brand Purple
         .attr('stroke-width', 3)
         .attr('d', line);
 
@@ -97,7 +97,7 @@ const MedianIncomeTrend = () => {
         .attr('cx', d => x(d.year.toString()) + x.bandwidth() / 2)
         .attr('cy', d => y(d.income))
         .attr('r', 5)
-        .attr('fill', '#228B22');
+        .attr('fill', 'var(--color-brand-primary)');
 
       // Add value labels above every point, including the max value
       g.selectAll('.label')
@@ -108,25 +108,22 @@ const MedianIncomeTrend = () => {
         .attr('y', d => y(d.income) - 10)
         .attr('text-anchor', 'middle')
         .attr('font-size', '10px')
-        .attr('fill', '#228B22')
+        .attr('font-family', 'IBM Plex Mono, Inter')
+        .attr('fill', 'black')
         .text(d => `$${d3.format(',')(d.income)}`);
 
       // Add axes (band scale, rotated labels)
-      const xAxis = g.append('g')
+      // X Axis
+      g.append('g')
+        .attr('class', 'x-axis brand-axis')
         .attr('transform', `translate(0,${innerHeight})`)
-        .call(d3.axisBottom(x));
-      xAxis.selectAll('text')
-        .attr('transform', 'translate(-10,10) rotate(-45)')
+        .call(d3.axisBottom(x))
+        .selectAll('text')
+        .attr('class', 'brand-tick')
+        .attr('transform', 'rotate(-35)')
         .style('text-anchor', 'end')
-        .attr('font-size', '16px')
-        .attr('font-weight', 'bold')
-        .attr('fill', 'black');
-      xAxis.selectAll('line')
-        .attr('stroke', 'black')
-        .attr('stroke-width', 1.5);
-      xAxis.selectAll('.domain')
-        .attr('stroke', 'black')
-        .attr('stroke-width', 2);
+        .attr('font-family', 'IBM Plex Mono, Inter')
+        .attr('fill', 'var(--color-brand-primary)');
 
       // Restore default y-axis ticks (no filtering)
       // Keep the same number of ticks, but set the last tick to 80,000
@@ -154,7 +151,9 @@ const MedianIncomeTrend = () => {
         .attr('y', 40)
         .attr('text-anchor', 'middle')
         .attr('font-size', '28px')
+        .attr('font-family', 'IBM Plex Mono, monospace')
         .attr('font-weight', 'bold')
+        .attr('fill', 'var(--accent)')
         .text('Median Household Income Trend (2013-2023)');
 
       // Add x axis label (move even lower)
@@ -187,8 +186,8 @@ const MedianIncomeTrend = () => {
   }, []);
 
   return (
-    <div className="w-full flex flex-col items-center p-4">
-      <svg ref={svgRef} className="max-w-full"></svg>
+    <div style={{ margin: '20px auto', maxWidth: 750, background: 'white', border: '1.5px solid #e9d5ff', borderRadius: '12px', padding: 24 }}>
+      <svg ref={svgRef} width={750} height={375} viewBox="0 0 750 375" style={{ display: 'block', margin: '0 auto', background: 'white' }} />
     </div>
   );
 };
