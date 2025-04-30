@@ -58,7 +58,7 @@ const HypertensionChart = () => {
     // Larger, more readable, and consistent chart
     const width = 750;
     const height = 375;
-    const margin = { top: 70, right: 40, bottom: 150, left: 90 }; // Increased bottom margin
+    const margin = { top: 70, right: 40, bottom: 60, left: 90 }; // Reduced bottom margin
     
     // Calculate inner dimensions
     const innerWidth = width - margin.left - margin.right;
@@ -80,7 +80,7 @@ const HypertensionChart = () => {
       .attr('y', 0)
       .attr('width', innerWidth)
       .attr('height', innerHeight)
-      .attr('fill', 'var(--background)');
+      .attr('fill', 'transparent');
     
     // Create x scale (simple band scale for categories)
     const xScale = d3.scaleBand()
@@ -105,38 +105,38 @@ const HypertensionChart = () => {
       .attr('class', 'brand-tick')
       .attr('transform', 'rotate(-35)')
       .style('text-anchor', 'end')
-      .style('font-family', 'var(--font-heading)')
-      .style('fill', 'var(--color-brand-primary)');
+      .style('font-family', 'IBM Plex Mono, monospace')
+      .style('fill', 'black')
+      .style('font-size', '14px');
     
     // Add y-axis (match MedianIncomeTrend ticks)
     g.append('g')
       .attr('class', 'y-axis brand-axis')
-      .call(d3.axisLeft(yScale).ticks(6).tickFormat(d => `${d}%`))
+      .call(d3.axisLeft(yScale).ticks(4).tickFormat(d => `${d}%`))
       .selectAll('text')
       .attr('class', 'brand-tick')
-      .style('font-family', 'var(--font-heading)')
-      .style('fill', 'var(--accent)')
+      .style('font-family', 'IBM Plex Mono, monospace')
+      .style('fill', 'black')
       .attr('font-size', '16px')
-      .attr('font-weight', 'bold')
-      .attr('fill', 'var(--foreground)');
+      .attr('font-weight', 'bold');
     
     // Make ALL axis lines black after BOTH axes are created
     svg.selectAll(".domain, .tick line")
-     .attr("stroke", "var(--border)")
+     .attr("stroke", "black")
      .attr("stroke-width", 1.5);
     
     // Add grid lines (match MedianIncomeTrend)
     g.append('g')
       .attr('class', 'grid')
       .selectAll('line')
-      .data(yScale.ticks(6))
+      .data(yScale.ticks(4))
       .enter()
       .append('line')
       .attr('x1', 0)
       .attr('x2', innerWidth)
       .attr('y1', d => yScale(d))
       .attr('y2', d => yScale(d))
-      .attr('stroke', 'var(--neutral-200)')
+      .attr('stroke', '#eee')
       .attr('stroke-dasharray', '2,2');
 
     // Define a shared color for the dots and line (match legend)
@@ -175,39 +175,41 @@ const HypertensionChart = () => {
      .attr("y", d => yScale(d.value) - 10)
      .attr("text-anchor", "middle")
      .attr("font-size", "10px")
-     .attr("font-family", 'var(--font-heading)')
-     .attr("fill", 'var(--secondary)')
+     .attr("font-family", 'IBM Plex Mono, Inter')
+     .attr("fill", 'black')
      .text(d => `${d.value}%`);
     
     // Add title
     svg.append("text")
        .attr("x", width / 2)
-       .attr("y", 30)
+       .attr("y", 40)
        .attr("text-anchor", "middle")
        .attr('font-size', '28px')
-       .attr('font-family', 'var(--font-heading)')
+       .attr('font-family', 'IBM Plex Mono, monospace')
        .attr('font-weight', 'bold')
-       .attr('fill', 'var(--accent)')
+       .attr('fill', 'var(--color-brand-primary)')
        .text('Hypertension Prevalence Trend (2013-2023)');
     
     // Add x-axis label (match MedianIncomeTrend)
     g.append("text")
      .attr("x", innerWidth / 2)
-     .attr("y", innerHeight + 110)
+     .attr("y", innerHeight + 30)
      .attr("text-anchor", "middle")
      .attr("font-size", "16px")
-     .attr('font-family', 'var(--font-heading)')
-     .attr('fill', 'var(--foreground)')
-     .text("Survey Period");
+     .attr('font-family', 'IBM Plex Mono, monospace')
+     .attr('fill', 'black')
+     .text("Year");
     
     // Add y-axis label (match MedianIncomeTrend)
-    g.append("text")
-     .attr("transform", "rotate(-90)")
-     .attr("x", -innerHeight / 2)
-     .attr("y", -90)
-     .attr("text-anchor", "middle")
-     .attr("font-size", "16px")
-     .text("Percentage (%)");
+    g.append('text')
+     .attr('transform', 'rotate(-90)')
+     .attr('x', -innerHeight / 2)
+     .attr('y', -90)
+     .attr('text-anchor', 'middle')
+     .attr('font-size', '16px')
+     .attr('font-family', 'IBM Plex Mono, monospace')
+     .attr('fill', 'black')
+     .text('Hypertension Prevalence (%)');
     
   }, [data]);
   
