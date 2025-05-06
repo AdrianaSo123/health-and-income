@@ -373,14 +373,16 @@ const BlackPopulationGeorgia = () => {
           </p>
         </div>
       )}
-      <svg ref={svgRef} style={{
-        maxWidth: '100%',
-        height: 'auto',
-        background: 'var(--color-brand-bg)',
-        border: '1.5px solid var(--color-brand-primary)',
-        borderRadius: '1.3rem',
-        boxShadow: '0 2px 16px 0 rgba(124, 86, 255, 0.08)'
-      }}></svg>
+      <div className="card-visual">
+        <svg ref={svgRef} style={{
+          maxWidth: '100%',
+          height: 'auto',
+          background: 'var(--color-brand-bg)',
+          border: '1.5px solid var(--color-brand-primary)',
+          borderRadius: '1.3rem',
+          boxShadow: '0 2px 16px 0 rgba(124, 86, 255, 0.08)'
+        }}></svg>
+      </div>
       {countyData.length > 0 && (
         <p className="text-sm mt-2">
           Showing black population percentages for {countyData.length} Georgia counties

@@ -122,8 +122,8 @@ const MedianIncomeTrend = () => {
         .attr('class', 'brand-tick')
         .attr('transform', 'rotate(-35)')
         .style('text-anchor', 'end')
-        .attr('font-family', 'IBM Plex Mono, Inter')
-        .attr('fill', 'var(--color-brand-primary)');
+        .attr('font-family', 'IBM Plex Mono, monospace')
+        .attr('fill', 'black');
 
       // Restore default y-axis ticks (no filtering)
       // Keep the same number of ticks, but set the last tick to 80,000
@@ -136,14 +136,19 @@ const MedianIncomeTrend = () => {
           .tickFormat(d => `$${d3.format(",")(d)}`));
       yAxis.selectAll('text')
         .attr('font-size', '16px')
-        .attr('font-weight', 'bold')
-        .attr('fill', 'black');
+        .attr('font-weight', 'normal')
+        .attr('fill', 'black')
+        .attr('font-family', 'IBM Plex Mono, monospace');
       yAxis.selectAll('line')
-        .attr('stroke', 'black')
+        .attr('stroke', '#e9d5ff')
         .attr('stroke-width', 1.5);
       yAxis.selectAll('.domain')
-        .attr('stroke', 'black')
+        .attr('stroke', '#e9d5ff')
         .attr('stroke-width', 2);
+      // Set grid lines to same color and dash as HypertensionTrend
+      g.selectAll('.grid line')
+        .attr('stroke', '#eee')
+        .attr('stroke-dasharray', '2,2');
 
       // Add title (move down, but enough margin)
       svg.append('text')
@@ -153,7 +158,7 @@ const MedianIncomeTrend = () => {
         .attr('font-size', '28px')
         .attr('font-family', 'IBM Plex Mono, monospace')
         .attr('font-weight', 'bold')
-        .attr('fill', 'var(--accent)')
+        .attr('fill', 'var(--color-brand-primary)')
         .text('Median Household Income Trend (2013-2023)');
 
       // Add x axis label (move even lower)
@@ -187,7 +192,9 @@ const MedianIncomeTrend = () => {
 
   return (
     <div style={{ margin: '20px auto', maxWidth: 750, background: 'white', border: '1.5px solid #e9d5ff', borderRadius: '12px', padding: 24 }}>
-      <svg ref={svgRef} width={750} height={375} viewBox="0 0 750 375" style={{ display: 'block', margin: '0 auto', background: 'white' }} />
+      <div className="card-visual">
+        <svg ref={svgRef} width={750} height={375} viewBox="0 0 750 375" style={{ display: 'block', margin: '0 auto', background: 'transparent' }} />
+      </div>
     </div>
   );
 };

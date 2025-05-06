@@ -172,7 +172,7 @@ const IncomeVsCardioGeorgia = () => {
       
       // Create the SVG element
       const svg = d3.select(svgRef.current)
-        .style('background', 'var(--background)');
+        .style('background', 'white');
       const width = 900;
       const height = 500;
       const margin = { top: 60, right: 50, bottom: 70, left: 70 };
@@ -203,6 +203,15 @@ const IncomeVsCardioGeorgia = () => {
         .selectAll("line")
         .attr('stroke', '#FFB43A') // brand accent color (Unified regression color, 2025-04-26)
         .attr("stroke-width", 1.5); // Make tick lines thicker
+      
+      // Add x-axis label
+      g.append("text")
+        .attr("x", innerWidth / 2)
+        .attr("y", innerHeight + 50)
+        .attr("text-anchor", "middle")
+        .attr("font-size", "16px")
+        .attr("fill", "var(--color-brand-primary)")
+        .text("Median Household Income ($k)");
       
       // Add Y axis with darker color
       g.append("g")
@@ -406,7 +415,7 @@ const IncomeVsCardioGeorgia = () => {
         .attr('cx', 20)
         .attr('cy', 40)
         .attr('r', 7)
-        .attr('fill', 'var(--color-brand-primary)'); // brand primary color
+        .attr('fill', '#FFB43A'); // orange for extreme values
       
       legend.append("text")
         .attr("x", 35)
@@ -445,18 +454,20 @@ const IncomeVsCardioGeorgia = () => {
         {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
       </div>
       
-      <svg 
-        ref={svgRef}
-        width="900" 
-        height="500" 
-        style={{
-          margin: '0 auto',
-          display: 'block',
-          border: '1px solid #bbb',
-           borderRadius: '12px',
-           background: 'white'
-        }}
-      ></svg>
+      <div className="card-visual">
+        <svg 
+          ref={svgRef}
+          width="900" 
+          height="500" 
+          style={{
+            margin: '0 auto',
+            display: 'block',
+            border: '1px solid #bbb',
+            borderRadius: '12px',
+            background: 'white'
+          }}
+        ></svg>
+      </div>
       
       <div style={{ maxWidth: '900px', margin: '20px auto', padding: '0 20px' }}>
         <h3>About this Visualization</h3>

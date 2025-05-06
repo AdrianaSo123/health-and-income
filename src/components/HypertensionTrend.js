@@ -58,7 +58,7 @@ const HypertensionChart = () => {
     // Larger, more readable, and consistent chart
     const width = 750;
     const height = 375;
-    const margin = { top: 70, right: 40, bottom: 60, left: 90 }; // Reduced bottom margin
+    const margin = { top: 70, right: 40, bottom: 80, left: 90 }; // Match bottom margin to MedianIncomeTrend for label alignment
     
     // Calculate inner dimensions
     const innerWidth = width - margin.left - margin.right;
@@ -193,7 +193,7 @@ const HypertensionChart = () => {
     // Add x-axis label (match MedianIncomeTrend)
     g.append("text")
      .attr("x", innerWidth / 2)
-     .attr("y", innerHeight + 30)
+     .attr("y", innerHeight + 80)
      .attr("text-anchor", "middle")
      .attr("font-size", "16px")
      .attr('font-family', 'IBM Plex Mono, monospace')
@@ -218,7 +218,9 @@ const HypertensionChart = () => {
       <div style={{ background: 'var(--card)', borderRadius: '12px', padding: '24px', margin: '24px 0', boxShadow: '0 2px 8px var(--neutral-200)' }}>
         {loading && <div aria-live="polite" style={{ color: 'var(--muted-foreground)', fontFamily: 'var(--font-heading)' }}>Loading data...</div>}
         {error && <div style={{ color: 'var(--destructive)', fontFamily: 'var(--font-heading)' }} role="alert">{error}</div>}
-        <svg ref={svgRef} style={{ width: '100%', height: 'auto', background: 'var(--background)', borderRadius: '12px' }} aria-label="Hypertension Prevalence Trend chart" role="img" />
+        <div className="card-visual">
+          <svg ref={svgRef} style={{ width: '100%', height: 'auto', background: 'var(--background)', borderRadius: '12px' }} aria-label="Hypertension Prevalence Trend chart" role="img" />
+        </div>
       </div>
     );
   }
