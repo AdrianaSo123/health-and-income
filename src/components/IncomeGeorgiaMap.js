@@ -339,19 +339,19 @@ const IncomeGeorgiaMap = () => {
           <div style={{ marginTop: '15px', fontSize: '14px', color: '#555' }}>
             <p><strong>Current environment:</strong> {window.location.hostname === 'localhost' ? 'Local Development' : 'GitHub Pages'}</p>
             <p><strong>Data file:</strong> GeorgiaIncomeData.csv</p>
-            <p><strong>Full URL:</strong> {window.location.href}</p>
-            <p><strong>Note:</strong> Please check that your CSV file is in the correct location: /public/data/GeorgiaIncomeData.csv</p>
-          </div>
         </div>
-      )}
+      </div>
+    )}
+    <div className="card-visual">
       <svg ref={svgRef} width="900" height="500"></svg>
-      {countyData.length > 0 && (
-        <p className="text-sm mt-2 text-white">
-          Showing median income for {countyData.length} Georgia counties
-        </p>
-      )}
     </div>
-  );
+    {countyData.length > 0 && (
+      <p className="text-sm mt-2 text-white">
+        Showing median income for {countyData.length} Georgia counties
+      </p>
+    )}
+  </div>
+);
 };
 
 export default IncomeGeorgiaMap;

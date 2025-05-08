@@ -333,7 +333,9 @@ const HypertensionGeorgia = () => {
           </p>
         </div>
       )}
-      <svg ref={svgRef} width="900" height="500"></svg>
+      <div className="card-visual">
+        <svg ref={svgRef} width="900" height="500"></svg>
+      </div>
       {countyData.length > 0 && (
         <p className="text-sm mt-2 text-white">
           Showing cardiovascular disease rates for {countyData.length} Georgia counties
