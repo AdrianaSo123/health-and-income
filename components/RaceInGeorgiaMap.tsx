@@ -80,22 +80,25 @@ export default function RaceInGeorgiaMap() {
 
   // D3 rendering effect
   useEffect(() => {
-    if (error || loading || !geoJson || !countyData.length) {
-      // Don't run D3 code until data is loaded and no error
-      return;
-    }
+    if (!geoJson || !svgRef.current) return;
 
-    // Clear any existing SVG content
+    // Clear previous chart
     d3.select(svgRef.current).selectAll("*").remove();
-    
-    const width = 750;
-    const height = 375;
+
+    // Chart dimensions - smaller for dashboard integration
+    const width = 360;
+    const height = 240;
+    const margin = { top: 5, right: 10, bottom: 30, left: 10 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    // Create the SVG element with responsive sizing
     const svg = d3
       .select(svgRef.current)
-      .attr("width", width)
-      .attr("height", height)
+      .attr("width", "100%")
+      .attr("height", "100%")
       .attr("viewBox", `0 0 ${width} ${height}`)
-      .attr("preserveAspectRatio", "xMidYMid meet");
+      .attr("preserveAspectRatio", "xMidYMid meet")
+      .attr("overflow", "visible");
 
     // Create percentage lookup for counties
     const percentByCounty: Record<string, number> = {};
@@ -111,9 +114,12 @@ export default function RaceInGeorgiaMap() {
     const maxValue = d3.max(values) || 100;
     
     // Use a reliable color scale that works well for choropleth maps
+    // Using the same color scheme as other visualizations for consistency
     const color = d3
-      .scaleSequential(d3.interpolateBlues)
+      .scaleSequential(d3.interpolatePurples) // Changed to purple for demographic data
       .domain([minValue, maxValue]);
+      
+    // Title will be added via a div above the map instead of in the SVG
 
     // Filter for Georgia counties
     const features = geoJson.features.filter((f: any) => {
@@ -125,12 +131,22 @@ export default function RaceInGeorgiaMap() {
     });
 
     // Projector
-    const projection = d3.geoMercator().fitSize([width, height], { type: "FeatureCollection", features });
+    const projection = d3.geoMercator().fitSize([innerWidth, innerHeight], { type: "FeatureCollection", features });
+    
+    // Create a group for the map with margin
+    const mapGroup = svg.append("g")
+      .attr("transform", `translate(${margin.left}, ${margin.top})`);
+      
+    // Add a background for the map area
+    mapGroup.append("rect")
+      .attr("width", innerWidth)
+      .attr("height", innerHeight)
+      .attr("fill", "#f8f9fa")
+      .attr("rx", 8);
     const path = d3.geoPath().projection(projection);
 
     // Draw counties
-    const paths = svg
-      .append("g")
+    const paths = mapGroup
       .selectAll("path")
       .data(features)
       .enter()
@@ -161,127 +177,85 @@ export default function RaceInGeorgiaMap() {
       .attr("cursor", "pointer"); // Show pointer cursor on hover
 
     // Create tooltip div if it doesn't exist
-    // First remove any existing tooltip to avoid duplicates
-    d3.select("#race-tooltip").remove();
-    
-    // Create a new tooltip
-    const tooltip = d3.select("body")
-      .append("div")
-      .attr("id", "race-tooltip")
-      .style("position", "fixed") // Use fixed positioning to ensure it's always visible
-      .style("visibility", "hidden")
-      .style("background-color", "white")
-      .style("border", "2px solid #2c3e50")
-      .style("border-radius", "6px")
-      .style("padding", "12px")
-      .style("box-shadow", "0 4px 14px rgba(44,62,80,0.25)")
-      .style("font-size", "14px")
-      .style("pointer-events", "none")
-      .style("transition", "opacity 0.15s ease-out, transform 0.15s ease-out")
-      .style("opacity", "0")
-      .style("transform", "translateY(10px)")
-      .style("z-index", "9999"); // Ensure it's above everything else
-
-    // Tooltip interaction with enhanced styling
     paths
-      .on("mouseover", function (event: MouseEvent, d: any) {
-        // Highlight the hovered county immediately on mouseover
-        d3.select(this)
-          .attr("stroke", "#000")
-          .attr("stroke-width", 1.5)
-          .attr("stroke-opacity", 1);
+      .on("mouseover", function(event, d: any) {
+        const countyName = d.properties.NAME || "Unknown";
+        const countyFips = d.id;
+        const countyValue = percentByCounty[countyName.toLowerCase()] || percentByCounty[countyName.toLowerCase() + " county"] || "No data";
+        
+        // Remove any existing tooltips
+        d3.select(".race-tooltip").remove();
+        
+        // Create tooltip
+        d3.select("body")
+          .append("div")
+          .attr("class", "race-tooltip")
+          .style("position", "absolute")
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 20) + "px")
+          .style("background", "white")
+          .style("border", "1px solid #ddd")
+          .style("border-radius", "4px")
+          .style("padding", "6px 10px")
+          .style("font-size", "10px")
+          .style("font-family", "system-ui, -apple-system, sans-serif")
+          .style("box-shadow", "0 2px 5px rgba(0,0,0,0.1)")
+          .style("z-index", 9999)
+          .style("pointer-events", "none")
+          .html(`
+            <div style="font-weight:bold; margin-bottom:2px;">${countyName} County</div>
+            <div>Black Population: ${typeof countyValue === 'number' ? countyValue.toFixed(1) + '%' : countyValue}</div>
+          `);
       })
-      .on("mousemove", function (event: MouseEvent, d: any) {
-        const countyName = d.properties.NAME || "";
-        let value = null;
-        
-        // Find percentage for this county
-        const variations = [
-          countyName.toLowerCase(),
-          countyName.toLowerCase().replace(" county", ""),
-          countyName.toLowerCase().replace(" county", "") + " county"
-        ];
-        
-        for (const variant of variations) {
-          if (percentByCounty[variant] !== undefined) {
-            value = percentByCounty[variant];
-            break;
-          }
-        }
-        
-        // Get the SVG's position relative to the viewport
-        const svgRect = svgRef.current?.getBoundingClientRect();
-        if (!svgRect) return;
-        
-        // Calculate position relative to the SVG container
-        const mouseX = event.clientX - svgRect.left;
-        const mouseY = event.clientY - svgRect.top;
-        
-        // Position tooltip with offset from cursor
-        // Use clientX and clientY for fixed positioning
-        tooltip
-          .style("visibility", "visible")
-          .style("left", `${event.clientX + 15}px`)
-          .style("top", `${event.clientY + 10}px`)
-          .style("opacity", "1")
-          .style("transform", "translateY(0)");
-        
-        // Enhanced tooltip content with brand styling and more prominent county name
-        tooltip.html(value !== null
-          ? `<div style='font-family:monospace; font-weight:700; font-size:18px; color:#2c3e50; margin-bottom:8px; border-bottom:2px solid rgba(44,62,80,0.3); padding-bottom:8px;'>${countyName} County</div>
-             <div style='display:flex; justify-content:space-between; margin-top:10px; align-items:center;'>
-               <span style='color:#22223B; font-weight:500; font-size:15px;'>Black Population:</span>
-               <span style='color:#2c3e50; font-weight:700; font-size:20px;'>${d3.format(".1f")(value)}%</span>
-             </div>`
-          : `<div style='font-family:monospace; font-weight:700; font-size:18px; color:#2c3e50; margin-bottom:8px; border-bottom:2px solid rgba(44,62,80,0.3); padding-bottom:8px;'>${countyName} County</div>
-             <div style='color:#888; font-style:italic; margin-top:10px; font-size:15px;'>No data available</div>`);
-      })
-      .on("mouseleave", function () {
-        // Hide tooltip with a smooth transition
-        tooltip
-          .style("opacity", "0")
-          .style("transform", "translateY(10px)")
-          // Set visibility to hidden after the transition completes
-          .transition()
-          .delay(150)
-          .style("visibility", "hidden");
-        
-        // Remove highlight with a smooth transition
+      .on("mouseout", function() {
+        d3.select(".race-tooltip").remove();
         d3.select(this)
-          .transition()
-          .duration(150)
           .attr("stroke", "#fff")
           .attr("stroke-width", 0.5)
-          .attr("stroke-opacity", 0.8);
+          .attr("fill", (d: any) => {
+            const countyName = d.properties.NAME || "Unknown";
+            const countyValue = percentByCounty[countyName.toLowerCase()] || percentByCounty[countyName.toLowerCase() + " county"];
+            return countyValue ? color(countyValue) : "#e0e0e0";
+          });
       });
 
-    // Add title
+    // Add subtitle - moved higher
     svg.append("text")
       .attr("x", width / 2)
-      .attr("y", 20)
+      .attr("y", height - 5)
       .attr("text-anchor", "middle")
-      .style("font-size", "16px")
-      .style("font-weight", "bold")
-      .style("font-family", "sans-serif")
-      .text("Black Population Percentage by County in Georgia");
+      .attr("font-size", "8px")
+      .attr("fill", "#666")
+      .text(`Data from U.S. Census Bureau`);
 
-    // Add a legend
-    const legendWidth = 200;
-    const legendHeight = 15;
-    const legendX = width - legendWidth - 20;
-    const legendY = height - 40;
+    // Add a legend - positioned completely below the map
+    const legendWidth = 120;
+    const legendHeight = 8;
+    const legendX = width / 2 - legendWidth / 2; // Center horizontally
+    const legendY = height - 10; // Position at the very bottom
 
     // Create gradient for legend
     const defs = svg.append("defs");
-    const linearGradient = defs.append("linearGradient")
-      .attr("id", "race-gradient")
+    const gradientId = "race-gradient";
+    const gradient = defs
+      .append("linearGradient")
+      .attr("id", gradientId)
       .attr("x1", "0%")
-      .attr("y1", "0%")
       .attr("x2", "100%")
+      .attr("y1", "0%")
       .attr("y2", "0%");
+      
+    // Add legend title
+    svg.append("text")
+      .attr("x", legendX + legendWidth / 2)
+      .attr("y", legendY - 5)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "8px")
+      .attr("fill", "#666")
+      .text("Black Population %");
 
     // Add color stops to gradient
-    linearGradient.selectAll("stop")
+    gradient.selectAll("stop")
       .data(d3.range(0, 1.01, 0.1) as number[])
       .enter().append("stop")
       .attr("offset", (d: number) => d * 100 + "%")
@@ -293,40 +267,57 @@ export default function RaceInGeorgiaMap() {
       .attr("y", legendY)
       .attr("width", legendWidth)
       .attr("height", legendHeight)
-      .style("fill", "url(#race-gradient)");
+      .style("fill", "url(#race-gradient)")
+      .style("stroke", "#ccc")
+      .style("stroke-width", 0.5)
+      .attr("rx", 2);
 
+    // Add legend title
+    svg.append("text")
+      .attr("x", legendX + legendWidth / 2)
+      .attr("y", legendY - 15)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "12px")
+      .attr("font-weight", "bold")
+      .attr("fill", "#555")
+      .text("Black Population");
+      
     // Add legend labels
     svg.append("text")
       .attr("x", legendX)
-      .attr("y", legendY - 5)
-      .style("font-size", "10px")
-      .style("text-anchor", "start")
+      .attr("y", legendY - 2)
+      .attr("font-size", "10px")
+      .attr("text-anchor", "start")
+      .attr("fill", "#555")
       .text(`${minValue.toFixed(1)}%`);
 
     svg.append("text")
       .attr("x", legendX + legendWidth)
-      .attr("y", legendY - 5)
-      .style("font-size", "10px")
-      .style("text-anchor", "end")
-      .text(`${maxValue.toFixed(1)}%`);
+      .attr("y", legendY - 2)
+      .attr("font-size", "10px")
+      .attr("text-anchor", "end")
+      .attr("fill", "#555")
+      .text(`${maxValue}%`);
 
   }, [geoJson, countyData, loading, error]);
 
   return (
-    <div className="w-full h-full">
-      {loading ? (
-        <div className="flex flex-col items-center justify-center h-full">
-          <div className="w-16 h-16 border-4 border-secondary-200 border-t-secondary-500 rounded-full animate-spin mb-4"></div>
-          <p className="text-lg font-mono text-primary-700">Loading map...</p>
+    <div className="relative w-full h-full">
+      {loading && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 z-10">
+          <div className="w-8 h-8 border-2 border-secondary-200 border-t-secondary-500 rounded-full animate-spin mb-2"></div>
+          <p className="text-xs text-gray-600">Loading...</p>
         </div>
-      ) : error ? (
-        <div className="flex flex-col items-center justify-center h-full">
-          <div className="text-red-500 text-xl mb-2">⚠️</div>
-          <p className="text-lg font-mono text-red-500">{error}</p>
-        </div>
-      ) : (
-        <svg ref={svgRef} className="w-full h-full"></svg>
       )}
+      {error && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 z-10">
+          <div className="text-red-500 text-center max-w-md">
+            <p className="text-xs font-bold">Error</p>
+            <p className="text-xs">{error}</p>
+          </div>
+        </div>
+      )}
+      <svg ref={svgRef} className="w-full h-full" />
     </div>
   );
 }

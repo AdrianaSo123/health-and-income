@@ -20,9 +20,9 @@ export default function IncomeGeorgiaMap() {
   // Return a skeleton during server-side rendering
   if (!isMounted) {
     return (
-      <div className="w-full h-[500px] flex flex-col items-center justify-center bg-white rounded-xl border-l-4 border border-primary-500 shadow-sm">
-        <div className="w-16 h-16 border-4 border-secondary-200 border-t-secondary-500 rounded-full animate-spin mb-4"></div>
-        <p className="text-lg font-mono text-primary-700">Loading Georgia income data...</p>
+      <div className="w-full h-full flex flex-col items-center justify-center bg-white">
+        <div className="w-8 h-8 border-2 border-secondary-200 border-t-secondary-500 rounded-full animate-spin mb-2"></div>
+        <p className="text-xs text-gray-600">Loading...</p>
       </div>
     );
   }
@@ -143,16 +143,17 @@ function IncomeGeorgiaMapContent() {
   }, []);
 
   useEffect(() => {
-    if (!geoJson || !countyData.length) return;
+    if (!geoJson || !countyData.length || !svgRef.current) return;
+    
+    // Clear previous chart
     d3.select(svgRef.current).selectAll("*").remove();
-    const width = 750;
-    const height = 375;
-    const svg = d3
-      .select(svgRef.current)
-      .attr("width", width)
-      .attr("height", height)
-      .attr("viewBox", `0 0 ${width} ${height}`)
-      .attr("preserveAspectRatio", "xMidYMid meet");
+
+    // Chart dimensions - smaller for dashboard integration
+    const width = 360;
+    const height = 240;
+    const margin = { top: 5, right: 10, bottom: 30, left: 10 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
 
     const incomeByFips: Record<string, number> = {};
     countyData.forEach((d) => {
@@ -168,89 +169,153 @@ function IncomeGeorgiaMapContent() {
     const missingGeo = countyData.filter((d) => !features.find((f: any) => f.id === d.fips)).map((d) => d.fips);
     setUnmatchedCSV(missingGeo);
     setUnmatchedGeo(missingFips);
-    // Income color scale
-    const incomes = countyData.map((d) => d.median_income);
-    const minIncome = d3.min(incomes) || 40000;
-    const maxIncome = d3.max(incomes) || 90000;
-    
-    // Use a reliable color scale that works well for choropleth maps
-    const color = d3
+
+    // Create a color scale with a more vibrant palette
+    const colorScale = d3
       .scaleSequential(d3.interpolateBlues)
-      .domain([minIncome, maxIncome]);
+      .domain([d3.min(countyData.map(d => d.median_income)) || 40000, d3.max(countyData.map(d => d.median_income)) || 90000]);
+
+    // Create tooltip div if it doesn't exist - with consistent styling across visualizations
+    // First remove any existing tooltip to avoid duplicates
+    d3.select("#income-tooltip").remove();
+    
+    // Create a new tooltip
+    const tooltip = d3.select("body")
+      .append("div")
+      .attr("id", "income-tooltip")
+      .style("position", "absolute")
+      .style("visibility", "hidden")
+      .style("background-color", "white")
+      .style("border", "1px solid #ddd")
+      .style("border-radius", "4px")
+      .style("padding", "6px 10px")
+      .style("box-shadow", "0 2px 5px rgba(0,0,0,0.1)")
+      .style("font-size", "10px")
+      .style("font-family", "system-ui, -apple-system, sans-serif")
+      .style("pointer-events", "none")
+      .style("transition", "opacity 0.15s ease, transform 0.15s ease")
+      .style("opacity", "0")
+      .style("transform", "translateY(3px)")
+      .style("z-index", "9999");
+
+    // Create the SVG element
+    const svg = d3
+      .select(svgRef.current)
+      .attr("width", width)
+      .attr("height", height)
+      .attr("viewBox", `0 0 ${width} ${height}`)
+      .attr("preserveAspectRatio", "xMidYMid meet")
+      .attr("overflow", "hidden");
       
-    // Use all features from the Georgia-only GeoJSON
-    // 'features' already declared above, so just reuse it here.
-    // Projector - use the standard projection that was working before
-    const projection = d3.geoMercator().fitSize([width, height], { type: "FeatureCollection", features });
+    // Instead of adding title to SVG, we'll add it via a div above the map
+      
+    // Create a group for the map with a background
+    const g = svg.append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+      
+    // Add a background for the map area
+    g.append("rect")
+      .attr("width", innerWidth)
+      .attr("height", innerHeight)
+      .attr("fill", "#f8f9fa")
+      .attr("rx", 8);
+
+    // Create a projection for Georgia
+    const projection = d3.geoMercator()
+      .fitSize([innerWidth, innerHeight], geoJson);
+
+    // Create a path generator
     const path = d3.geoPath().projection(projection);
-    // Draw counties
-    const paths = svg
-      .append("g")
-      .selectAll("path")
-      .data(features)
+
+    // Draw the counties with improved interaction
+    g.selectAll("path")
+      .data(geoJson.features)
       .enter()
       .append("path")
-      .attr("d", path)
+      .attr("d", path as any)
       .attr("fill", (d: any) => {
-        // Use FIPS code for color lookup
-        const fips = d.id;
-        const val = incomeByFips[fips];
-        return val ? color(val) : "#f5f5f5"; // Light gray for counties with no data
+        const countyFips = d.id;
+        const countyDataItem = countyData.find((item) => item.fips === countyFips);
+        return countyDataItem ? colorScale(countyDataItem.median_income) : "#e0e0e0";
       })
       .attr("stroke", "#fff")
       .attr("stroke-width", 0.5)
-      .attr("stroke-opacity", 0.8)
-      .attr("shape-rendering", "geometricPrecision"); // Smoother rendering
-
-    // Tooltip interaction
-    const tooltip = document.getElementById("income-tooltip");
-    paths
-      .on("mousemove", function (event: MouseEvent, d: any) {
-        if (!tooltip) return;
-        const countyName = d.properties.NAME || d.properties.name || d.id;
-        const fips = d.id;
-        const val = incomeByFips[fips];
-        tooltip.style.display = "block";
-        tooltip.style.left = event.offsetX + 24 + "px";
-        tooltip.style.top = event.offsetY + 12 + "px";
-        tooltip.innerHTML = val
-          ? `<div style='font-family:monospace; font-weight:700; font-size:16px; color:#246BCE; margin-bottom:4px;'>${countyName} County</div>
-             <div style='display:flex; justify-content:space-between; margin-top:6px;'>
-               <span style='color:#22223B; font-weight:500;'>Median Income:</span>
-               <span style='color:#246BCE; font-weight:700;'>$${d3.format(",.0f")(val)}</span>
-             </div>`
-          : `<div style='font-family:monospace; font-weight:700; font-size:16px; color:#246BCE; margin-bottom:4px;'>${countyName} County</div>
-             <div style='color:#888; font-style:italic; margin-top:6px;'>No income data available</div>`;
+      .attr("cursor", "pointer")
+      .on("mouseover", function(event, d: any) {
+        const countyFips = d.id;
+        const countyDataItem = countyData.find((item) => item.fips === countyFips);
+        const countyName = d.properties.NAME;
+        const income = countyDataItem ? countyDataItem.median_income : "No data";
+        const incomeFormatted = `$${income.toLocaleString()}`;
+        
+        // Enhanced tooltip content with consistent styling - smaller for dashboard
+        tooltip.html(
+          `<div style='font-weight:bold; font-size:11px; color:#333; margin-bottom:2px;'>${countyName}</div>
+           <div style='display:flex; justify-content:space-between;'>
+             <span style='color:#555; font-size:10px; margin-right:6px;'>Income:</span>
+             <span style='color:#333; font-weight:bold; font-size:10px;'>${income.toLocaleString ? '$' + income.toLocaleString() : income}</span>
+           </div>`
+        );
+        
+        d3.select(this)
+          .attr("stroke", "#333")
+          .attr("stroke-width", 2)
+          .attr("fill", (d: any) => {
+            const countyFips = d.id;
+            const countyDataItem = countyData.find((item) => item.fips === countyFips);
+            return countyDataItem ? d3.color(colorScale(countyDataItem.median_income))?.brighter(0.3)?.toString() || "#4e79a7" : "#e0e0e0";
+          });
+        
+        // Show the tooltip
+        tooltip
+          .style("visibility", "visible")
+          .style("opacity", "1")
+          .style("transform", "translateY(0)");
       })
-      .on("mouseleave", function () {
-        if (tooltip) tooltip.style.display = "none";
+      .on("mousemove", function(event) {
+        tooltip
+          .style("top", (event.pageY - 10) + "px")
+          .style("left", (event.pageX + 10) + "px");
+      })
+      .on("mouseout", function(event, d: any) {
+        tooltip.style("visibility", "hidden");
+        d3.select(this)
+          .attr("stroke", "#fff")
+          .attr("stroke-width", 0.5)
+          .attr("fill", (d: any) => {
+            const countyFips = d.id;
+            const countyDataItem = countyData.find((item) => item.fips === countyFips);
+            return countyDataItem ? colorScale(countyDataItem.median_income) : "#e0e0e0";
+          });
       });
 
-    // Add legend
-    const legendWidth = 180; // Even smaller width for compact display
-    const legendHeight = 12;
-    // Position the legend in the top right corner, far away from any counties
-    const legendSvg = svg
-      .append("g")
-      .attr("transform", `translate(${width - legendWidth - 130},${60})`);
+    // Add a legend - positioned completely below the map
+    const legendWidth = 120;
+    const legendHeight = 8;
+    const legendX = width / 2 - legendWidth / 2; // Center horizontally
+    const legendY = height - 10; // Position at the very bottom
+    const legendSvg = svg.append("g")
+      .attr("transform", `translate(${legendX},${legendY})`);
     
     // Create a linear scale for the legend
     const legendScale = d3
       .scaleLinear()
-      .domain(color.domain() as [number, number])
+      .domain(colorScale.domain() as [number, number])
       .range([0, legendWidth]);
     
     // Create the axis with abbreviated dollar formatting (40k instead of $40,000)
     const legendAxis = d3
       .axisBottom(legendScale)
-      .ticks(4) // Fewer ticks to prevent overlap
+      .ticks(3) 
       .tickFormat((d) => {
         const num = d as number;
-        return `$${Math.round(num/1000)}k`; // Format as 40k instead of $40,000
+        return `$${Math.round(num/1000)}k`; 
       });
     
     // Create gradient for the legend
-    const defs = svg.append("defs");
+    const defs = d3
+      .select(svgRef.current)
+      .append("defs");
     const gradientId = "income-gradient";
     const gradient = defs
       .append("linearGradient")
@@ -265,7 +330,7 @@ function IncomeGeorgiaMapContent() {
       gradient
         .append("stop")
         .attr("offset", `${i}%`)
-        .attr("stop-color", color(
+        .attr("stop-color", colorScale(
           legendScale.invert((i / 100) * legendWidth)
         ));
     }
@@ -285,30 +350,42 @@ function IncomeGeorgiaMapContent() {
       .attr("transform", `translate(0,${legendHeight})`)
       .call(legendAxis)
       .selectAll("text")
-      .attr("font-size", "0.75rem")
-      .attr("dy", "0.5em");
-    
-    // Add a title above the legend
-    legendSvg
-      .append("text")
+      .attr("font-size", "8px")
+      .attr("dy", "0.8em");
+      
+    // Add legend title
+    legendSvg.append("text")
       .attr("x", legendWidth / 2)
-      .attr("y", -8)
+      .attr("y", -5)
       .attr("text-anchor", "middle")
-      .attr("font-size", "0.9rem")
-      .attr("fill", "#333")
-      .text("Median Family Income (USD)");
+      .attr("font-size", "8px")
+      .attr("fill", "#666")
+      .text("Median Income");
   }, [geoJson, countyData]);
 
   // These states are now handled within the content component
   if (loading || !geoJson) {
     return (
-      <div className="w-full h-[500px] flex flex-col items-center justify-center bg-white rounded-xl border-l-4 border border-primary-500 shadow-sm">
-        <div className="w-16 h-16 border-4 border-secondary-200 border-t-secondary-500 rounded-full animate-spin mb-4"></div>
-        <p className="text-lg font-mono text-primary-700">Loading Georgia income data...</p>
+      <div className="relative w-full h-full flex items-center justify-center">
+        {loading && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 z-10">
+            <div className="w-8 h-8 border-2 border-secondary-200 border-t-secondary-500 rounded-full animate-spin mb-2"></div>
+            <p className="text-xs text-gray-600">Loading...</p>
+          </div>
+        )}
+        {error && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 z-10">
+            <div className="text-red-500 text-center max-w-md">
+              <p className="text-xs font-bold">Error</p>
+              <p className="text-xs">{error}</p>
+            </div>
+          </div>
+        )}
+        <svg ref={svgRef} className="w-full h-full" />
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="w-full h-[500px] flex flex-col items-center justify-center bg-white rounded-xl border-l-4 border border-accent-500 shadow-sm">
@@ -325,38 +402,22 @@ function IncomeGeorgiaMapContent() {
   }
   
   return (
-    <div className="w-full h-[500px] flex flex-col bg-white rounded-xl border-l-4 border border-primary-500 shadow-sm overflow-hidden">
-      {/* Card Header */}
-      <div className="bg-surface px-8 py-4 border-b border-primary-100">
-        <h3 className="text-xl font-mono text-primary-700 font-bold">Median Family Income by County in Georgia</h3>
-        <p className="text-neutral text-medium-contrast">2019-2023 Census Data</p>
-      </div>
-      
-      {/* Map Container */}
-      <div className="flex-grow relative overflow-x-auto p-4">
-        <svg ref={svgRef} style={{ width: "100%", height: "100%", minWidth: 600, minHeight: 400 }} />
-        
-        {/* Tooltip overlay */}
-        <div
-          id="income-tooltip"
-          style={{
-            position: "absolute",
-            background: "rgba(255,255,255,0.97)",
-            border: "1px solid #246BCE", // Primary blue from brand guidelines
-            borderRadius: 8,
-            padding: "0.75rem 1.25rem",
-            fontSize: "1rem",
-            color: "#22223B", // Neutral deep navy from brand guidelines
-            fontWeight: 600,
-            boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-            zIndex: 10,
-            display: "none",
-            minWidth: 200,
-            maxWidth: 280,
-            pointerEvents: "none"
-          }}
-        />
-      </div>
+    <div className="w-full h-full relative">
+      {loading && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 z-10">
+          <div className="w-8 h-8 border-2 border-secondary-200 border-t-secondary-500 rounded-full animate-spin mb-2"></div>
+          <p className="text-xs text-gray-600">Loading...</p>
+        </div>
+      )}
+      {error && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 z-10">
+          <div className="text-red-500 text-center max-w-md">
+            <p className="text-xs font-bold">Error</p>
+            <p className="text-xs">{error}</p>
+          </div>
+        </div>
+      )}
+      <svg ref={svgRef} className="w-full h-full" />
     </div>
   );
 }

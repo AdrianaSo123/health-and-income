@@ -97,12 +97,17 @@ export default function HypertensionMap() {
     // Clear any existing SVG content
     d3.select(svgRef.current).selectAll("*").remove();
     
-    const width = 750;
-    const height = 375;
+    // Chart dimensions - smaller for dashboard integration
+    const width = 360;
+    const height = 240;
+    const margin = { top: 5, right: 10, bottom: 30, left: 10 };
+    const innerWidth = width - margin.left - margin.right;
+    const innerHeight = height - margin.top - margin.bottom;
+    
     const svg = d3
       .select(svgRef.current)
-      .attr("width", width)
-      .attr("height", height)
+      .attr("width", "100%")
+      .attr("height", "100%")
       .attr("viewBox", `0 0 ${width} ${height}`)
       .attr("preserveAspectRatio", "xMidYMid meet");
 
@@ -118,7 +123,7 @@ export default function HypertensionMap() {
     const maxRate = d3.max(rates) || 60;
     
     // Use a reliable color scale that works well for choropleth maps
-    const color = d3
+    const colorScale = d3
       .scaleSequential(d3.interpolateReds)
       .domain([minRate, maxRate]);
 
@@ -132,103 +137,101 @@ export default function HypertensionMap() {
     });
 
     // Projector
-    const projection = d3.geoMercator().fitSize([width, height], { type: "FeatureCollection", features });
+    const projection = d3.geoMercator().fitSize([innerWidth, innerHeight], { type: "FeatureCollection", features });
     const path = d3.geoPath().projection(projection);
 
-    // Draw counties
-    const paths = svg
-      .append("g")
-      .selectAll("path")
+    // Create a group for the map with a background
+    const g = svg.append("g")
+      .attr("transform", `translate(${margin.left},${margin.top})`);
+      
+    // Title will be added via a div above the map instead of in the SVG
+      
+    // Add a background for the map area
+    g.append("rect")
+      .attr("width", innerWidth)
+      .attr("height", innerHeight)
+      .attr("fill", "#f8f9fa")
+      .attr("rx", 8);
+
+    // Draw the counties with improved interaction
+    g.selectAll("path")
       .data(features)
       .enter()
       .append("path")
-      .attr("d", (d: any) => path(d)) // Fix TypeScript error by using a function
+      .attr("d", path as any)
       .attr("fill", (d: any) => {
-        // Use FIPS code for color lookup
-        const fips = d.id;
-        const val = rateByFips[fips];
-        return val ? color(val) : "#f5f5f5"; // Light gray for counties with no data
+        const countyFips = d.id;
+        const countyDataItem = countyData.find((item) => item.fips === countyFips);
+        return countyDataItem ? colorScale(countyDataItem.disease_rate) : "#e0e0e0";
       })
       .attr("stroke", "#fff")
       .attr("stroke-width", 0.5)
-      .attr("stroke-opacity", 0.8)
-      .attr("shape-rendering", "geometricPrecision") // Smoother rendering
-      .attr("cursor", "pointer"); // Show pointer cursor on hover
-
-    // Tooltip interaction with enhanced styling
-    const tooltip = document.getElementById("hypertension-tooltip");
-    paths
-      .on("mousemove", function (event: MouseEvent, d: any) {
-        if (!tooltip) return;
-        const countyName = d.properties.NAME || d.properties.name || "";
-        const fips = d.id;
-        const val = rateByFips[fips];
+      .attr("cursor", "pointer")
+      .on("mouseover", function(event, d: any) {
+        const countyDataItem = countyData.find((item) => item.fips === d.id);
+        const countyName = d.properties.NAME;
+        const rate = countyDataItem ? countyDataItem.disease_rate : "No data";
         
-        // Get the SVG's position relative to the viewport
-        const svgRect = svgRef.current?.getBoundingClientRect();
-        if (!svgRect) return;
+        // Remove any existing tooltips
+        d3.select(".hypertension-tooltip").remove();
         
-        // Calculate position relative to the SVG container
-        const mouseX = event.clientX - svgRect.left;
-        const mouseY = event.clientY - svgRect.top;
+        const tooltip = d3
+          .select("body")
+          .append("div")
+          .attr("class", "hypertension-tooltip")
+          .style("position", "absolute")
+          .style("visibility", "visible")
+          .style("background-color", "white")
+          .style("border", "1px solid #ddd")
+          .style("border-radius", "4px")
+          .style("padding", "6px 10px")
+          .style("box-shadow", "0 2px 5px rgba(0,0,0,0.1)")
+          .style("font-size", "10px")
+          .style("font-family", "system-ui, -apple-system, sans-serif")
+          .style("pointer-events", "none")
+          .style("z-index", "9999")
+          .style("transition", "opacity 0.15s ease")
+          .html(`<div><strong>${countyName} County</strong><br/>Hypertension Rate: ${rate}%</div>`)
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 20) + "px");
         
-        // Position tooltip with offset from cursor
-        tooltip.style.display = "block";
-        tooltip.style.left = mouseX + 24 + "px";
-        tooltip.style.top = mouseY + 12 + "px";
-        
-        // Add transition effect
-        tooltip.style.opacity = "1";
-        tooltip.style.transform = "translateY(0)";
-        
-        // Enhanced tooltip content with brand styling
-        tooltip.innerHTML = val
-          ? `<div style='font-family:monospace; font-weight:700; font-size:16px; color:#d7263d; margin-bottom:4px; border-bottom:1px solid rgba(215,38,61,0.2); padding-bottom:4px;'>${countyName} County</div>
-             <div style='display:flex; justify-content:space-between; margin-top:6px; align-items:center;'>
-               <span style='color:#22223B; font-weight:500;'>Hypertension Rate:</span>
-               <span style='color:#d7263d; font-weight:700; font-size:18px;'>${d3.format(".1f")(val)}%</span>
-             </div>`
-          : `<div style='font-family:monospace; font-weight:700; font-size:16px; color:#d7263d; margin-bottom:4px; border-bottom:1px solid rgba(215,38,61,0.2); padding-bottom:4px;'>${countyName} County</div>
-             <div style='color:#888; font-style:italic; margin-top:6px;'>No data available</div>`;
-      })
-      .on("mouseleave", function () {
-        if (tooltip) {
-          // Add fade-out transition
-          tooltip.style.opacity = "0";
-          tooltip.style.transform = "translateY(10px)";
-          // Hide after transition completes
-          setTimeout(() => {
-            tooltip.style.display = "none";
-          }, 200);
-        }
-      })
-      // Add hover effect to counties
-      .on("mouseenter", function() {
         d3.select(this)
-          .transition()
-          .duration(200)
-          .attr("stroke-width", 1.5)
           .attr("stroke", "#333")
-          .attr("stroke-opacity", 1);
+          .attr("stroke-width", 2);
       })
-      .on("mouseleave", function() {
+      .on("mousemove", function(event) {
+        d3.select(".hypertension-tooltip")
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 20) + "px");
+      })
+      .on("mouseout", function(event, d: any) {
+        d3.select(".hypertension-tooltip").remove();
         d3.select(this)
-          .transition()
-          .duration(200)
-          .attr("stroke-width", 0.5)
           .attr("stroke", "#fff")
-          .attr("stroke-opacity", 0.8);
+          .attr("stroke-width", 0.5)
+          .attr("fill", (d: any) => {
+            const countyFips = d.id;
+            const countyDataItem = countyData.find((item) => item.fips === countyFips);
+            return countyDataItem ? colorScale(countyDataItem.disease_rate) : "#e0e0e0";
+          });
       });
 
-    // Add legend
-    const legendWidth = 200;
-    const legendHeight = 10;
-    const legendX = width - legendWidth - 20;
-    const legendY = height - 40;
-    
-    const legendSvg = svg
-      .append("g")
-      .attr("transform", `translate(${legendX}, ${legendY})`);
+    // Add a legend - positioned completely below the map
+    const legendWidth = 120;
+    const legendHeight = 8;
+    const legendX = width / 2 - legendWidth / 2; // Center horizontally
+    const legendY = height - 10; // Position at the very bottom
+    const legendSvg = svg.append("g")
+      .attr("transform", `translate(${legendX},${legendY})`);
+      
+    // Add legend title
+    legendSvg.append("text")
+      .attr("x", legendWidth / 2)
+      .attr("y", -5)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "8px")
+      .attr("fill", "#666")
+      .text("Hypertension Rate %");
     
     const legendScale = d3
       .scaleLinear()
@@ -255,7 +258,7 @@ export default function HypertensionMap() {
       gradient
         .append("stop")
         .attr("offset", `${i}%`)
-        .attr("stop-color", color(
+        .attr("stop-color", colorScale(
           legendScale.invert((i / 100) * legendWidth)
         ));
     }
@@ -286,9 +289,12 @@ export default function HypertensionMap() {
   // Render loading state
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-full">
-        <div className="w-16 h-16 border-4 border-secondary-200 border-t-secondary-500 rounded-full animate-spin mb-4"></div>
-        <p className="text-lg font-mono text-primary-700">Loading hypertension data...</p>
+      <div className="relative w-full h-full flex items-center justify-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 z-10">
+          <div className="w-16 h-16 border-4 border-secondary-200 border-t-secondary-500 rounded-full animate-spin mb-4"></div>
+          <p className="text-lg font-mono text-primary-700">Loading hypertension data...</p>
+        </div>
+        <svg ref={svgRef} className="w-full h-full" />
       </div>
     );
   }
@@ -296,15 +302,14 @@ export default function HypertensionMap() {
   // Render error state
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center h-full">
-        <div className="text-accent-500 text-5xl mb-4">⚠️</div>
-        <p className="text-lg font-medium text-neutral">{error}</p>
-        <button 
-          className="mt-6 px-6 py-2 bg-accent-50 hover:bg-accent-100 text-accent-700 font-mono rounded-lg transition-colors"
-          onClick={() => window.location.reload()}
-        >
-          Retry
-        </button>
+      <div className="relative w-full h-full flex items-center justify-center">
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80 z-10">
+          <div className="text-red-500 text-center max-w-md">
+            <p className="text-lg font-bold mb-2">Error Loading Data</p>
+            <p>{error}</p>
+          </div>
+        </div>
+        <svg ref={svgRef} className="w-full h-full" />
       </div>
     );
   }
