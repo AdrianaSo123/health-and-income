@@ -13,6 +13,8 @@ import RaceInGeorgia from './components/RaceInGeorgia';
 
 function App() {
   // Detect if embedded (via query param or window context)
+  // Commented out since it's not currently used, but keeping for future use
+  /* 
   const isEmbedded = (() => {
     if (typeof window !== 'undefined') {
       // Check for ?embedded=true in URL
@@ -25,6 +27,7 @@ function App() {
     }
     return false;
   })();
+  */
 
   return (
     <div className="App container">

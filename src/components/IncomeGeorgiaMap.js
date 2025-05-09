@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import getDataContent from '../utils/dataPath';
+// Removed unused import: import getDataContent from '../utils/dataPath';
 
 const IncomeGeorgiaMap = () => {
   const svgRef = useRef(null);
