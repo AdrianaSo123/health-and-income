@@ -156,15 +156,63 @@ const HypertensionChart = () => {
      .attr("stroke-width", 3)
      .attr("d", line);
     
-    // Add data points (match legend color)
-    g.selectAll(".dot")
-     .data(data)
-     .enter()
-     .append("circle")
-     .attr("cx", d => xScale(d.year) + xScale.bandwidth() / 2)
-     .attr("cy", d => yScale(d.value))
-     .attr("r", 5)
-     .attr("fill", mainDotColor);
+    // Add data points with hover effects
+    g.selectAll(".data-point")
+      .data(data)
+      .enter()
+      .append("circle")
+      .attr("class", "data-point")
+      .attr("cx", d => xScale(d.year) + xScale.bandwidth() / 2)
+      .attr("cy", d => yScale(d.value))
+      .attr("r", 5)
+      .attr("fill", d => d.year === "2020" ? "#e15759" : mainDotColor) // Highlight 2020 (COVID year)
+      .attr("stroke", "#fff")
+      .attr("stroke-width", 1)
+      .on("mouseover", function(event, d) {
+        d3.select(this)
+          .attr("r", 7)
+          .attr("stroke-width", 2);
+          
+        // Remove any existing tooltip
+        d3.select(".hypertension-trend-tooltip").remove();
+        
+        // Create tooltip with detailed information
+        let tooltipContent = `
+          <div style="font-weight:bold; margin-bottom:2px;">${d.year}</div>
+          <div>Hypertension Rate: ${d.value.toFixed(1)}%</div>
+        `;
+        
+        d3.select("body")
+          .append("div")
+          .attr("class", "hypertension-trend-tooltip")
+          .style("position", "absolute")
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 20) + "px")
+          .style("background", "white")
+          .style("border", "1px solid #ddd")
+          .style("border-radius", "4px")
+          .style("padding", "6px 10px")
+          .style("font-size", "12px")
+          .style("font-family", "system-ui, -apple-system, sans-serif")
+          .style("box-shadow", "0 2px 5px rgba(0,0,0,0.1)")
+          .style("z-index", 9999)
+          .style("pointer-events", "none")
+          .html(tooltipContent);
+      })
+      .on("mousemove", function(event) {
+        // Update tooltip position as mouse moves
+        d3.select(".hypertension-trend-tooltip")
+          .style("left", (event.pageX + 10) + "px")
+          .style("top", (event.pageY - 20) + "px");
+      })
+      .on("mouseout", function() {
+        d3.select(this)
+          .attr("r", 5)
+          .attr("stroke-width", 1);
+          
+        // Remove tooltip
+        d3.select(".hypertension-trend-tooltip").remove();
+      });
     
     // Add value labels (match MedianIncomeTrend)
     g.selectAll(".label")
