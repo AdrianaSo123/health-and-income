@@ -2,6 +2,7 @@ import React from 'react';
 import './App.css';
 import './force-white-bg.css';
 import './debug-hypertension.css';
+import './deployed-styles.css'; // Additional styles for deployed version
 
 import MedianIncomeTrend from './components/MedianIncomeTrend';
 import Footer from './components/Footer.jsx';
