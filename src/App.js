@@ -6,6 +6,7 @@ import './deployed-styles.css'; // Additional styles for deployed version
 
 import MedianIncomeTrend from './components/MedianIncomeTrend';
 import Footer from './components/Footer.jsx';
+import Navbar from './components/Navbar.jsx';
 import HypertensionTrend from './components/HypertensionTrend';
 import IncomeGeorgiaMap from './components/IncomeGeorgiaMap';
 import HypertensionGeorgia from './components/HypertensionGeorgia';
@@ -32,7 +33,8 @@ function App() {
 
   return (
     <div className="App container">
-
+      <Navbar />
+      
       <header className="bg-glassy shadow">
         <h1 className="bold-title">Health and Income Trends</h1>
         <p className="tag">Explore the relationship between health and income in Georgia</p>

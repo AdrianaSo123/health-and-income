@@ -7,6 +7,72 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
+/* Navbar Styles */
+.navbar {
+  padding: 1rem 0;
+  margin-bottom: 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.navbar-logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo-img {
+  height: 40px;
+  width: auto;
+  margin-right: 0.5rem;
+}
+
+.logo-text {
+  font-family: 'IBM Plex Mono', monospace;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--color-brand-primary, #7F4DE2);
+}
+
+.navbar-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.nav-link {
+  font-family: 'IBM Plex Mono', monospace;
+  color: #333;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.nav-link:hover {
+  color: var(--color-brand-primary, #7F4DE2);
+}
+
+.github-link {
+  background-color: #333;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+}
+
+.github-link:hover {
+  background-color: var(--color-brand-primary, #7F4DE2);
+  color: white;
+}
+
 header.bg-glassy {
   padding: 2rem 1rem;
   margin-bottom: 2rem;
@@ -79,6 +145,56 @@ header.bg-glassy {
   opacity: 0.7;
 }
 
+/* Footer Styles */
+footer.bg-glassy {
+  margin-top: 3rem;
+  padding: 2rem 0;
+  border-radius: 10px 10px 0 0;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-left {
+  flex: 1;
+}
+
+.copyright {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.small-text {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.social-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.social-link {
+  font-family: 'IBM Plex Mono', monospace;
+  color: #333;
+  text-decoration: none;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: color 0.2s ease;
+}
+
+.social-link:hover {
+  color: var(--color-brand-primary, #7F4DE2);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .bold-title {
@@ -87,5 +203,21 @@ header.bg-glassy {
   
   .glassy-card {
     padding: 1.5rem;
+  }
+  
+  .footer-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+  
+  .navbar-content {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .navbar-links {
+    flex-wrap: wrap;
+    justify-content: center;
   }
 }
