@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/health-and-income/static/css/main.c2fef82a.css",
-    "main.js": "/health-and-income/static/js/main.444e45ea.js",
+    "main.css": "/health-and-income/static/css/main.277de176.css",
+    "main.js": "/health-and-income/static/js/main.605450a9.js",
     "static/js/453.5fb11916.chunk.js": "/health-and-income/static/js/453.5fb11916.chunk.js",
     "index.html": "/health-and-income/index.html",
-    "main.c2fef82a.css.map": "/health-and-income/static/css/main.c2fef82a.css.map",
-    "main.444e45ea.js.map": "/health-and-income/static/js/main.444e45ea.js.map",
+    "main.277de176.css.map": "/health-and-income/static/css/main.277de176.css.map",
+    "main.605450a9.js.map": "/health-and-income/static/js/main.605450a9.js.map",
     "453.5fb11916.chunk.js.map": "/health-and-income/static/js/453.5fb11916.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.c2fef82a.css",
-    "static/js/main.444e45ea.js"
+    "static/css/main.277de176.css",
+    "static/js/main.605450a9.js"
   ]
 }
